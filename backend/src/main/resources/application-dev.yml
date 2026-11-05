@@ -1,11 +1,20 @@
 # Profile dev: ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 # Cổng debug 5005 được bật bởi profile Maven "dev" trong pom.xml (JDWP, suspend=n).
 spring:
+  flyway:
+    # Thêm tài khoản demo (db/dev/R__demo_users.sql), mật khẩu Demo@2026
+    locations: classpath:db/migration,classpath:db/dev
   jpa:
     show-sql: false
     properties:
       hibernate:
         format_sql: true
+
+hrm:
+  auth:
+    cookie:
+      # Local chạy http://localhost; môi trường thật luôn Secure
+      secure: false
 
 management:
   endpoint:

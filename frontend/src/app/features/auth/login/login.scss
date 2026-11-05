@@ -1,0 +1,274 @@
+// Theo mockup "SS Pack HRM — Mockup", artboard Main: khối thương hiệu 5fr bên trái, form 6fr bên phải.
+$mobile-breakpoint: 960px;
+
+:host {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  min-height: 100vh;
+  background: var(--surface-100);
+}
+
+// ---- Khối thương hiệu (chữ trên nền brand dùng ink) ----
+.hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-6);
+  padding: 56px;
+  background: var(--brand);
+  color: var(--ink);
+}
+
+.hero-tiles {
+  position: absolute;
+  top: 40px;
+  right: 40px;
+  display: grid;
+  grid-template-columns: repeat(3, 64px);
+  gap: var(--space-2);
+}
+
+.tile {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-md);
+}
+
+.tile-strong {
+  background: var(--brand-strong);
+}
+
+.tile-ink {
+  background: var(--ink);
+}
+
+.tile-light {
+  background: var(--surface-raised);
+  opacity: 0.25;
+}
+
+.hero-copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 420px;
+  margin-top: 200px;
+
+  h1 {
+    font-family: var(--font-sans);
+    font-size: 40px;
+    line-height: 48px;
+    font-weight: 700;
+  }
+
+  p {
+    font-size: 16px;
+    line-height: 26px;
+  }
+}
+
+.hero-points {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    &::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      flex-shrink: 0;
+      border-radius: var(--radius-pill);
+      background: var(--ink);
+    }
+  }
+}
+
+// ---- Form ----
+.panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px var(--space-6);
+}
+
+.panel-inner {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.logo {
+  height: 44px;
+  width: auto;
+  align-self: flex-start;
+}
+
+.login-heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.muted,
+.caption {
+  color: var(--ink-muted);
+}
+
+.caption {
+  font: var(--text-caption);
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.field-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+input[type='email'],
+input[type='password'] {
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  font: var(--text-body);
+  color: var(--ink);
+
+  &[aria-invalid='true'] {
+    border-color: var(--danger);
+  }
+}
+
+.field-error,
+.form-error {
+  color: var(--danger);
+}
+
+.field-error {
+  font: var(--text-caption);
+}
+
+.form-error {
+  padding: 12px var(--space-4);
+  border: 1px solid var(--danger);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+
+  input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: var(--brand-strong);
+  }
+}
+
+.primary {
+  height: 44px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--brand-strong);
+  color: var(--on-brand);
+  font: var(--text-body);
+  font-weight: 600;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: progress;
+  }
+}
+
+.link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--brand-strong);
+  font: var(--text-label);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+// ---- Tài khoản dùng thử ----
+.demo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+}
+
+.demo-title {
+  font: var(--text-label);
+  font-weight: 600;
+}
+
+.demo-list {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 6px 12px;
+  margin: 0;
+  font: var(--text-label);
+
+  dt {
+    color: var(--ink-muted);
+  }
+
+  dd {
+    margin: 0;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .link-button {
+    text-align: left;
+  }
+}
+
+// ---- Màn hình hẹp: ẩn khối thương hiệu ----
+@media (max-width: $mobile-breakpoint) {
+  :host {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hero {
+    display: none;
+  }
+
+  .panel {
+    align-items: flex-start;
+    padding: var(--space-6) var(--space-4);
+  }
+}

@@ -1,3 +1,5 @@
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { TranslocoTestingModule } from '@jsverse/transloco';
@@ -18,7 +20,7 @@ describe('Shell', () => {
           preloadLangs: true,
         }),
       ],
-      providers: [provideRouter(routes)],
+      providers: [provideRouter(routes), provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
   });
 
@@ -54,8 +56,12 @@ describe('Shell', () => {
     expect(hrefs).toEqual(NAV_ITEMS.map((item) => `/${item.path}`));
   });
 
+  it('mọi trang trong shell yêu cầu đăng nhập', () => {
+    expect(routes.find((r) => r.path === '')?.canActivate?.length).toBe(1);
+  });
+
   it('mỗi phân hệ có một route lazy-load riêng', () => {
-    const children = routes[0].children ?? [];
+    const children = routes.find((r) => r.path === '')?.children ?? [];
     for (const item of NAV_ITEMS) {
       const route = children.find((r) => r.path === item.path);
       expect(route?.loadChildren, item.path).toBeTypeOf('function');

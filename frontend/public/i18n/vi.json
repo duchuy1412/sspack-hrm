@@ -16,9 +16,6 @@
     "recruitment": "Tuyển dụng",
     "reports": "Báo cáo"
   },
-  "user": {
-    "guest": "Chưa đăng nhập"
-  },
   "language": {
     "label": "Ngôn ngữ",
     "vi": "Tiếng Việt",
@@ -27,5 +24,51 @@
   "placeholder": {
     "message": "Phân hệ này đang được phát triển.",
     "hint": "Khung trang đã sẵn sàng; tính năng sẽ được thêm theo từng user story trong SRS."
+  },
+  "auth": {
+    "heroTitle": "Quản lý nhân sự SS Pack",
+    "heroText": "Hồ sơ, nghỉ phép, chấm công, tính lương và tuyển dụng cho toàn bộ nhân viên nhà máy và văn phòng.",
+    "heroPoints": {
+      "mobile": "Gửi và duyệt đơn nghỉ trên điện thoại",
+      "payslip": "Xem phiếu lương hằng tháng ngay khi phát hành",
+      "timesheet": "Bảng công tự tổng hợp theo ca làm việc"
+    },
+    "title": "Đăng nhập",
+    "subtitle": "Dùng email công ty để đăng nhập.",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "rememberMe": "Ghi nhớ đăng nhập trên máy này",
+    "forgotPassword": "Quên mật khẩu?",
+    "forgotPasswordPending": "Chức năng đặt lại mật khẩu đang được phát triển. Vui lòng liên hệ bộ phận Nhân sự.",
+    "submit": "Đăng nhập",
+    "submitting": "Đang đăng nhập…",
+    "logout": "Đăng xuất",
+    "demoTitle": "Tài khoản dùng thử",
+    "demoHint": "Bấm vào email để điền sẵn. Mật khẩu chung: Demo@2026.",
+    "demoRoles": {
+      "admin": "Quản trị",
+      "hr": "Nhân sự",
+      "manager": "Quản lý",
+      "employee": "Nhân viên"
+    },
+    "validation": {
+      "emailRequired": "Vui lòng nhập email",
+      "emailInvalid": "Email không đúng định dạng",
+      "passwordRequired": "Vui lòng nhập mật khẩu"
+    },
+    "errors": {
+      "AUTH_INVALID_CREDENTIALS": "Email hoặc mật khẩu không đúng.",
+      "AUTH_ACCOUNT_LOCKED": "Tài khoản tạm khóa do đăng nhập sai nhiều lần. Vui lòng thử lại sau {{minutes}} phút.",
+      "AUTH_ACCOUNT_DISABLED": "Tài khoản đã bị vô hiệu hóa. Vui lòng liên hệ quản trị hệ thống.",
+      "network": "Không kết nối được máy chủ. Vui lòng kiểm tra mạng và thử lại.",
+      "generic": "Đăng nhập không thành công. Vui lòng thử lại."
+    }
+  },
+  "roles": {
+    "ADMIN": "Quản trị hệ thống",
+    "HR": "Nhân sự",
+    "MANAGER": "Quản lý trực tiếp",
+    "EMPLOYEE": "Nhân viên",
+    "INTERVIEWER": "Người phỏng vấn"
   }
 }
