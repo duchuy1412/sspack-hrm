@@ -1,0 +1,67 @@
+<header class="topbar">
+  <button
+    type="button"
+    class="menu-button"
+    [attr.aria-expanded]="menuOpen()"
+    aria-controls="sidebar"
+    (click)="toggleMenu()"
+  >
+    <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+      <path d="M3 5h14M3 10h14M3 15h14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+    </svg>
+    <span class="visually-hidden">{{ (menuOpen() ? 'nav.closeMenu' : 'nav.openMenu') | transloco }}</span>
+  </button>
+  <img src="brand/ss-pack-mark.svg" alt="SS Pack" class="topbar-mark" />
+</header>
+
+@if (menuOpen()) {
+  <div class="scrim" aria-hidden="true" (click)="closeMenu()"></div>
+}
+
+<nav id="sidebar" class="sidebar" [class.open]="menuOpen()" [attr.aria-label]="'nav.label' | transloco">
+  <a routerLink="/" class="logo-link" (click)="closeMenu()">
+    <img src="brand/ss-pack-logo.svg" alt="SS Pack" class="logo" />
+  </a>
+
+  <ul class="nav-list">
+    @for (item of navItems; track item.path) {
+      <li>
+        <a
+          class="nav-item"
+          [routerLink]="item.path"
+          routerLinkActive="active"
+          ariaCurrentWhenActive="page"
+          (click)="closeMenu()"
+        >
+          <span class="nav-bar" aria-hidden="true"></span>
+          <span class="nav-label">{{ item.labelKey | transloco }}</span>
+        </a>
+      </li>
+    }
+  </ul>
+
+  <div class="sidebar-footer">
+    <div class="user">
+      <span class="avatar" aria-hidden="true">?</span>
+      <span class="user-name">{{ 'user.guest' | transloco }}</span>
+    </div>
+    <div class="lang-switch" role="group" [attr.aria-label]="'language.label' | transloco">
+      @for (lang of langs; track lang) {
+        <button
+          type="button"
+          class="lang-option"
+          [class.selected]="activeLang() === lang"
+          [attr.aria-pressed]="activeLang() === lang"
+          [attr.title]="'language.' + lang | transloco"
+          (click)="setLang(lang)"
+        >
+          {{ lang.toUpperCase() }}
+        </button>
+      }
+    </div>
+  </div>
+</nav>
+
+<main class="content">
+  <router-outlet />
+</main>

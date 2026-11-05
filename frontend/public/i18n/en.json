@@ -1,0 +1,31 @@
+{
+  "app": {
+    "name": "SS Pack HRM"
+  },
+  "nav": {
+    "label": "Main navigation",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "dashboard": "Overview",
+    "employees": "Employees",
+    "org": "Organization",
+    "leave": "Leave",
+    "approvals": "Approvals",
+    "attendance": "Attendance",
+    "payroll": "Payroll",
+    "recruitment": "Recruitment",
+    "reports": "Reports"
+  },
+  "user": {
+    "guest": "Not signed in"
+  },
+  "language": {
+    "label": "Language",
+    "vi": "Tiếng Việt",
+    "en": "English"
+  },
+  "placeholder": {
+    "message": "This module is under development.",
+    "hint": "The page shell is ready; features will be added one SRS user story at a time."
+  }
+}
