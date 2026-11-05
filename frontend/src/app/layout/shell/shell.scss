@@ -224,3 +224,43 @@ $mobile-breakpoint: 960px;
     transition: none;
   }
 }
+
+// ---- Khối người dùng và hành động ở đáy thanh bên ----
+.user-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.user-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-role {
+  font: var(--text-caption);
+  color: var(--ink-muted);
+}
+
+.footer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.logout {
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  color: var(--ink);
+  font: var(--text-label);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--surface-100);
+  }
+}

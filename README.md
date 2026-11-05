@@ -104,6 +104,21 @@ cd backend
 
 Flyway tự tạo schema `hrm` và chạy migration khi khởi động. Profile `dev` mở thêm cổng debug **5005**: trong IntelliJ, tạo cấu hình *Remote JVM Debug* trỏ tới `localhost:5005`, hoặc chạy trực tiếp class `HrmApplication` bằng nút Debug.
 
+Backend cần biến `JWT_SECRET` (tối thiểu 32 byte) để ký access token; `infra/.env.example` có sẵn giá trị cho local. Môi trường thật phải sinh khóa riêng: `openssl rand -base64 48`.
+
+### Tài khoản demo (chỉ profile `dev`)
+
+Profile `dev` nạp thêm tài khoản dùng thử (`db/dev/R__demo_users.sql`), mật khẩu chung **`Demo@2026`**. Các profile khác không có tài khoản này.
+
+| Vai trò | Email |
+| --- | --- |
+| Quản trị hệ thống | `admin@sspack.vn` |
+| Nhân sự | `thuha.le@sspack.vn` |
+| Quản lý trực tiếp | `minhanh.tran@sspack.vn` |
+| Nhân viên | `vanduc.pham@sspack.vn` |
+
+Đăng nhập (PLT-01): access token JWT 15 phút trả trong body và chỉ giữ trong bộ nhớ trình duyệt; refresh token 7 ngày nằm trong cookie `HttpOnly; SameSite=Strict`, xoay vòng mỗi lần làm mới. Sai mật khẩu 5 lần liên tiếp thì tài khoản bị khóa 15 phút.
+
 ### 3. Frontend
 
 ```bash

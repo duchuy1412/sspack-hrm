@@ -16,9 +16,6 @@
     "recruitment": "Recruitment",
     "reports": "Reports"
   },
-  "user": {
-    "guest": "Not signed in"
-  },
   "language": {
     "label": "Language",
     "vi": "Tiếng Việt",
@@ -27,5 +24,51 @@
   "placeholder": {
     "message": "This module is under development.",
     "hint": "The page shell is ready; features will be added one SRS user story at a time."
+  },
+  "auth": {
+    "heroTitle": "SS Pack HR management",
+    "heroText": "Profiles, leave, attendance, payroll and recruitment for every factory and office employee.",
+    "heroPoints": {
+      "mobile": "Submit and approve leave requests on your phone",
+      "payslip": "See your monthly payslip as soon as it is published",
+      "timesheet": "Timesheets compiled automatically by shift"
+    },
+    "title": "Sign in",
+    "subtitle": "Use your company email to sign in.",
+    "email": "Email",
+    "password": "Password",
+    "rememberMe": "Keep me signed in on this device",
+    "forgotPassword": "Forgot password?",
+    "forgotPasswordPending": "Password reset is under development. Please contact the HR department.",
+    "submit": "Sign in",
+    "submitting": "Signing in…",
+    "logout": "Sign out",
+    "demoTitle": "Demo accounts",
+    "demoHint": "Click an email to fill it in. Shared password: Demo@2026.",
+    "demoRoles": {
+      "admin": "Admin",
+      "hr": "HR",
+      "manager": "Manager",
+      "employee": "Employee"
+    },
+    "validation": {
+      "emailRequired": "Please enter your email",
+      "emailInvalid": "Email is not valid",
+      "passwordRequired": "Please enter your password"
+    },
+    "errors": {
+      "AUTH_INVALID_CREDENTIALS": "Incorrect email or password.",
+      "AUTH_ACCOUNT_LOCKED": "Account temporarily locked after too many failed sign-ins. Try again in {{minutes}} minutes.",
+      "AUTH_ACCOUNT_DISABLED": "This account has been disabled. Please contact the system administrator.",
+      "network": "Cannot reach the server. Please check your connection and try again.",
+      "generic": "Sign-in failed. Please try again."
+    }
+  },
+  "roles": {
+    "ADMIN": "System administrator",
+    "HR": "HR",
+    "MANAGER": "Line manager",
+    "EMPLOYEE": "Employee",
+    "INTERVIEWER": "Interviewer"
   }
 }

@@ -10,17 +10,14 @@ import org.flywaydb.core.api.MigrationInfo;
 import org.flywaydb.core.api.MigrationState;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import vn.sspack.hrm.support.PostgresTestcontainersConfig;
+import vn.sspack.hrm.support.IntegrationTest;
 
 /**
  * Kiểm tra migration Flyway chạy được trên PostgreSQL 16 thật và tạo đúng lược đồ trong docs/schema.sql.
  */
-@SpringBootTest
-@Import(PostgresTestcontainersConfig.class)
+@IntegrationTest
 class MigrationIT {
 
     @Autowired
@@ -36,7 +33,7 @@ class MigrationIT {
                 .filter(m -> m.getVersion() != null)
                 .toList();
 
-        assertThat(versioned).extracting(m -> m.getVersion().getVersion()).contains("1");
+        assertThat(versioned).extracting(m -> m.getVersion().getVersion()).contains("1", "2", "3");
         assertThat(versioned).allMatch(m -> m.getState() == MigrationState.SUCCESS);
         assertThat(flyway.info().pending()).isEmpty();
     }
@@ -50,6 +47,22 @@ class MigrationIT {
                 """, Integer.class);
 
         assertThat(tables).isEqualTo(50);
+    }
+
+    @Test
+    void referenceDataSeedsSystemRolesWithPermissions() {
+        List<String> roles = jdbc.queryForList(
+                "SELECT code FROM hrm.roles WHERE is_system ORDER BY code", String.class);
+        Integer hrPermissions = jdbc.queryForObject("""
+                SELECT count(*) FROM hrm.role_permissions rp JOIN hrm.roles r ON r.id = rp.role_id
+                WHERE r.code = 'HR'
+                """, Integer.class);
+        Integer demoUsers = jdbc.queryForObject(
+                "SELECT count(*) FROM hrm.users WHERE email = 'admin@sspack.vn'", Integer.class);
+
+        assertThat(roles).containsExactly("ADMIN", "EMPLOYEE", "HR", "INTERVIEWER", "MANAGER");
+        assertThat(hrPermissions).isPositive();
+        assertThat(demoUsers).as("tài khoản demo chỉ có ở profile dev").isZero();
     }
 
     @Test

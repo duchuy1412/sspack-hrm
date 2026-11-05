@@ -8,19 +8,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 
-import vn.sspack.hrm.support.PostgresTestcontainersConfig;
+import vn.sspack.hrm.support.IntegrationTest;
 
 /**
  * Kiểm tra các endpoint hạ tầng của khung: health check và tài liệu OpenAPI.
  */
-@SpringBootTest
-@AutoConfigureMockMvc
-@Import(PostgresTestcontainersConfig.class)
+@IntegrationTest
 class ApplicationEndpointsIT {
 
     @Autowired
@@ -31,6 +26,15 @@ class ApplicationEndpointsIT {
         mvc.perform(get("/actuator/health"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("UP"));
+    }
+
+    @Test
+    void protectedEndpointWithoutTokenReturnsVietnameseProblemDetail() throws Exception {
+        mvc.perform(get("/api/v1/auth/me"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentTypeCompatibleWith("application/problem+json"))
+                .andExpect(jsonPath("$.code").value("UNAUTHENTICATED"))
+                .andExpect(jsonPath("$.detail").value("Bạn cần đăng nhập để tiếp tục."));
     }
 
     @Test
