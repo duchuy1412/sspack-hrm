@@ -1,0 +1,226 @@
+// Kích thước theo mockup "SS Pack HRM — Mockup" (artboard Sidebar); màu, chữ, bo góc lấy từ tokens.css.
+$sidebar-width: 248px;
+$mobile-breakpoint: 960px;
+
+:host {
+  display: grid;
+  grid-template-columns: $sidebar-width minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+// ---- Thanh bên ----
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px 12px;
+  overflow-y: auto;
+  background: var(--surface-raised);
+  border-right: 1px solid var(--line);
+}
+
+.logo-link {
+  align-self: flex-start;
+  margin-left: var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.logo {
+  display: block;
+  height: 32px;
+  width: auto;
+}
+
+.nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  padding-right: 10px;
+  border-radius: var(--radius-md);
+  font: var(--text-body);
+  font-weight: 500;
+  color: var(--ink-muted);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--ink);
+    background: var(--surface-100);
+  }
+
+  &.active {
+    color: var(--ink);
+    font-weight: 600;
+    background: var(--brand-soft);
+
+    .nav-bar {
+      background: var(--brand);
+    }
+  }
+}
+
+// Thanh chỉ báo mục đang chọn: màu brand, 4px
+.nav-bar {
+  width: 4px;
+  height: 20px;
+  flex-shrink: 0;
+  border-radius: 0 4px 4px 0;
+  background: transparent;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: var(--space-4) var(--space-2) 0;
+  border-top: 1px solid var(--line);
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: var(--radius-pill);
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  font: var(--text-label);
+  font-weight: 600;
+}
+
+.user-name {
+  font: var(--text-label);
+  font-weight: 600;
+}
+
+.lang-switch {
+  display: inline-flex;
+  align-self: flex-start;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.lang-option {
+  min-width: 44px;
+  height: 32px;
+  padding: 0 var(--space-2);
+  border: 0;
+  background: var(--surface-raised);
+  color: var(--ink-muted);
+  font: var(--text-label);
+  cursor: pointer;
+
+  & + & {
+    border-left: 1px solid var(--line-strong);
+  }
+
+  &.selected {
+    background: var(--brand-strong);
+    color: var(--on-brand);
+  }
+}
+
+// ---- Vùng nội dung ----
+.content {
+  min-width: 0;
+  padding: var(--space-6);
+}
+
+// ---- Thanh trên cho màn hình hẹp ----
+.topbar,
+.scrim {
+  display: none;
+}
+
+@media (max-width: $mobile-breakpoint) {
+  :host {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    height: 56px;
+    padding: 0 var(--space-4);
+    background: var(--surface-raised);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .menu-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    margin-left: calc(-1 * var(--space-2));
+    border: 0;
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .topbar-mark {
+    height: 28px;
+    width: auto;
+  }
+
+  .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 4;
+    width: $sidebar-width;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+
+    &.open {
+      transform: translateX(0);
+      box-shadow: 0 8px 24px color-mix(in srgb, var(--ink) 16%, transparent);
+    }
+  }
+
+  .scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 3;
+    background: color-mix(in srgb, var(--ink) 32%, transparent);
+  }
+
+  .content {
+    padding: var(--space-4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar {
+    transition: none;
+  }
+}

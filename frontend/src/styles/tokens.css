@@ -1,0 +1,85 @@
+/*
+ * Design tokens SS Pack — sao chép nguyên văn từ design system "SS Pack" (tokens.css sinh từ tokens.json).
+ * Không sửa tay; khi design system đổi, chép lại file này. Mọi màu, chữ, khoảng cách trong ứng dụng lấy từ đây.
+ */
+/* SS Pack — generated from tokens.json */
+:root, [data-theme="light"] {
+  --surface-100: #f4f6f5; /* Nền trang (page background) của toàn ứng dụng. */
+  --surface-raised: #ffffff; /* Thẻ, bảng dữ liệu, form, menu, hộp thoại đặt trên surface-100. */
+  --ink: #18211d; /* Chữ chính, tiêu đề, số liệu trên surface-100, surface-raised và brand-soft. */
+  --ink-muted: #56625c; /* Chữ phụ, nhãn cột bảng, gợi ý dưới ô nhập trên surface-100, surface-raised và brand-soft (≥5.4:1). */
+  --line: #dbe2de; /* Đường kẻ trang trí: phân cách hàng bảng, viền thẻ. Không dùng làm viền ô nhập. */
+  --line-strong: #7f8a85; /* Viền ô nhập, checkbox, select ở trạng thái thường (≥3.2:1 trên surface-100 và surface-raised). */
+  --brand: #209ed8; /* Màu chủ đạo của thương hiệu SS Pack (#209ED8): logo, khối màu lớn, thanh chỉ báo mục đang chọn, biểu đồ, minh họa. Chỉ đạt 3:1 trên surface-raised (2.8:1 trên surface-100) nên không dùng cho chữ thường hay nhãn nút; chữ từ 24px trở lên được phép. Chữ đặt trên nền brand dùng ink (5.4:1). */
+  --brand-strong: #0b6f9e; /* Sắc đậm cùng tông của brand: nền nút chính, liên kết, tab đang chọn, vòng focus, chữ trạng thái Đã duyệt. Trên surface-100, surface-raised (≥5.1:1) và brand-soft (4.9:1). */
+  --brand-soft: #e6f4fb; /* Nền hàng được chọn, nền chip trạng thái Đã duyệt, mục menu đang chọn. Chữ trên nền này: ink, ink-muted hoặc brand-strong. */
+  --on-brand: #ffffff; /* Chữ và biểu tượng trên nền brand-strong (5.5:1). Trên nền brand dùng ink, không dùng on-brand. */
+  --warning: #8f5600; /* Trạng thái Chờ duyệt, cảnh báo hợp đồng sắp hết hạn: chữ và chấm màu trên surface-100, surface-raised (≥5.5:1). */
+  --danger: #b42318; /* Từ chối, lỗi nhập liệu, nút xóa. Chữ trên surface-100, surface-raised (≥6:1). Gần độ sáng với brand-strong nên luôn đi kèm chữ hoặc biểu tượng, không phân biệt chỉ bằng màu. */
+}
+:root {
+  --space-1: 4px; /* Khoảng cách giữa biểu tượng và chữ trong nút, chip. */
+  --space-2: 8px; /* Khoảng cách giữa các nút cạnh nhau, giữa nhãn và ô nhập. */
+  --space-4: 16px; /* Padding thẻ, padding ô bảng theo chiều ngang, khoảng cách giữa các trường form. */
+  --space-6: 24px; /* Khoảng cách giữa các khu vực trong trang, lề nội dung trang. */
+  --radius-sm: 4px; /* Ô nhập, checkbox, select. */
+  --radius-md: 8px; /* Nút, thẻ, hộp thoại, menu. */
+  --radius-pill: 999px; /* Chip trạng thái (Chờ duyệt, Đã duyệt, Từ chối), avatar. */
+  --font-sans: "Be Vietnam Pro", "Segoe UI", system-ui, sans-serif;
+  --text-display: 600 28px/36px var(--font-sans); /* Tiêu đề trang, mỗi trang một lần. */
+  --text-heading: 600 20px/28px var(--font-sans); /* Tiêu đề thẻ và khu vực trong trang. */
+  --text-subheading: 600 16px/24px var(--font-sans); /* Tiêu đề nhóm trường trong form, tab. */
+  --text-body: 400 14px/22px var(--font-sans); /* Nội dung, ô bảng, ô nhập. */
+  --text-label: 500 13px/18px var(--font-sans); /* Nhãn trường, nút, chip trạng thái. */
+  --text-caption: 400 12px/16px var(--font-sans); /* Chú thích, thời gian, gợi ý dưới ô nhập; màu ink-muted. */
+  --text-numeric: 500 14px/22px var(--font-sans); /* Số tiền, số ngày công trong bảng: căn phải, chữ số tabular (font-variant-numeric: tabular-nums). */
+}
+.display {
+  font-family: var(--font-sans);
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.heading {
+  font-family: var(--font-sans);
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.subheading {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.body {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 22px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.label {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.caption {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.numeric {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 22px;
+  font-weight: 500;
+  letter-spacing: 0;
+}

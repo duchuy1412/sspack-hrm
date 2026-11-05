@@ -1,0 +1,18 @@
+# Profile dev: ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+# Cổng debug 5005 được bật bởi profile Maven "dev" trong pom.xml (JDWP, suspend=n).
+spring:
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+management:
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    vn.sspack.hrm: DEBUG
+    org.flywaydb: INFO

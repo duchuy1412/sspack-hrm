@@ -1,0 +1,31 @@
+{
+  "app": {
+    "name": "SS Pack HRM"
+  },
+  "nav": {
+    "label": "Điều hướng chính",
+    "openMenu": "Mở menu",
+    "closeMenu": "Đóng menu",
+    "dashboard": "Tổng quan",
+    "employees": "Nhân viên",
+    "org": "Cơ cấu tổ chức",
+    "leave": "Nghỉ phép",
+    "approvals": "Duyệt đơn",
+    "attendance": "Chấm công",
+    "payroll": "Tính lương",
+    "recruitment": "Tuyển dụng",
+    "reports": "Báo cáo"
+  },
+  "user": {
+    "guest": "Chưa đăng nhập"
+  },
+  "language": {
+    "label": "Ngôn ngữ",
+    "vi": "Tiếng Việt",
+    "en": "English"
+  },
+  "placeholder": {
+    "message": "Phân hệ này đang được phát triển.",
+    "hint": "Khung trang đã sẵn sàng; tính năng sẽ được thêm theo từng user story trong SRS."
+  }
+}
