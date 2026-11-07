@@ -15,6 +15,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import vn.sspack.hrm.platform.application.audit.AuditEntity;
 import vn.sspack.hrm.platform.application.audit.AuditLogService;
 import vn.sspack.hrm.platform.application.audit.AuditLogService.Action;
 import vn.sspack.hrm.platform.domain.auth.LoginLockPolicy;
@@ -35,8 +36,6 @@ import vn.sspack.hrm.shared.error.ApiException;
 public class AuthService {
 
     private static final Logger log = LoggerFactory.getLogger(AuthService.class);
-    private static final String ENTITY_USER = "USER";
-    private static final String ENTITY_REFRESH_TOKEN = "REFRESH_TOKEN";
 
     private final UserAccountRepository users;
     private final RefreshTokenRepository refreshTokens;
@@ -177,19 +176,29 @@ public class AuthService {
         int revoked = refreshTokens.revokeAllActive(token.getUserId(), now);
         log.warn("Phát hiện refresh token bị dùng lại cho user {}; đã thu hồi {} phiên", token.getUserId(), revoked);
         users.findById(token.getUserId()).ifPresent(u -> audit.record(u.getCompanyId(), u.getId(), Action.LOGIN,
-                ENTITY_REFRESH_TOKEN, token.getId(), null,
+                AuditEntity.REFRESH_TOKENS, token.getId(), null,
                 Map.of("result", "REUSE_DETECTED", "revokedSessions", revoked), ipAddress));
     }
 
     // ================================================================= đăng xuất
 
     @Transactional
-    public void logout(String rawRefreshToken) {
+    public void logout(String rawRefreshToken, String ipAddress) {
         if (rawRefreshToken == null || rawRefreshToken.isBlank()) {
             return;
         }
-        refreshTokens.findForUpdateByHash(refreshTokenCodec.hash(rawRefreshToken))
-                .ifPresent(token -> token.revoke(OffsetDateTime.now(clock)));
+        Optional<RefreshToken> found = refreshTokens.findForUpdateByHash(refreshTokenCodec.hash(rawRefreshToken));
+        if (found.isEmpty() || found.get().isRevoked()) {
+            return;
+        }
+        RefreshToken token = found.get();
+        token.revoke(OffsetDateTime.now(clock));
+        Optional<UserAccount> user = users.findById(token.getUserId());
+        if (user.isPresent()) {
+            audit.record(user.get().getCompanyId(), user.get().getId(), Action.LOGOUT,
+                    AuditEntity.REFRESH_TOKENS, token.getId(), null, Map.of("email", user.get().getEmail()),
+                    ipAddress);
+        }
     }
 
     // ================================================================= người dùng hiện tại
@@ -219,7 +228,7 @@ public class AuthService {
         Map<String, Object> value = new LinkedHashMap<>();
         value.put("result", result);
         value.put("email", user.getEmail());
-        audit.record(user.getCompanyId(), user.getId(), Action.LOGIN, ENTITY_USER, user.getId(), null, value,
+        audit.record(user.getCompanyId(), user.getId(), Action.LOGIN, AuditEntity.USERS, user.getId(), null, value,
                 ipAddress);
     }
 }

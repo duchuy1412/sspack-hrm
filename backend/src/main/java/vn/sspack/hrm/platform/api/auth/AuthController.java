@@ -73,8 +73,9 @@ public class AuthController {
     @SecurityRequirements
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(
-            @CookieValue(name = "${hrm.auth.cookie.name}", required = false) String refreshToken) {
-        authService.logout(refreshToken);
+            @CookieValue(name = "${hrm.auth.cookie.name}", required = false) String refreshToken,
+            HttpServletRequest http) {
+        authService.logout(refreshToken, http.getRemoteAddr());
         return ResponseEntity.noContent()
                 .header(HttpHeaders.SET_COOKIE, refreshCookie("", Duration.ZERO).toString())
                 .build();

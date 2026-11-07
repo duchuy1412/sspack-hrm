@@ -102,7 +102,8 @@
     "cancel": "Cancel",
     "tabs": {
       "roles": "Roles",
-      "users": "Role assignment"
+      "users": "Role assignment",
+      "audit": "Audit log"
     },
     "pager": {
       "label": "Pagination",
@@ -194,7 +195,55 @@
       "ROLE_IN_USE": "This role is assigned to {{assignedUserCount}} users. Remove it from them before deleting.",
       "USER_NO_ROLE": "A user must have at least one role.",
       "USER_SELF_LOCKOUT": "You cannot remove the role that lets you manage accounts from yourself.",
-      "VALIDATION_FAILED": "Please check the highlighted fields."
+      "VALIDATION_FAILED": "Please check the highlighted fields.",
+      "AUDIT_RANGE_INVALID": "The start date must be on or before the end date.",
+      "AUDIT_ENTITY_UNKNOWN": "This table is not in the audit log."
+    },
+    "audit": {
+      "intro": "Every create, update, delete and sign-in is recorded: who, when, which table, values before and after. The log cannot be edited or deleted.",
+      "filters": {
+        "from": "From",
+        "to": "To",
+        "user": "Performed by",
+        "entity": "Table",
+        "action": "Action",
+        "all": "All",
+        "apply": "Filter",
+        "reset": "Clear filters"
+      },
+      "columns": {
+        "time": "Time",
+        "user": "Performed by",
+        "action": "Action",
+        "entity": "Object",
+        "ip": "IP address",
+        "details": "Details"
+      },
+      "system": "System",
+      "viewDetails": "View details",
+      "empty": "No log entries match the filters.",
+      "total": "{{count}} entries",
+      "close": "Close",
+      "diff": {
+        "field": "Field",
+        "before": "Before",
+        "after": "After",
+        "changed": "changed",
+        "empty": "This action stores no values."
+      }
     }
+  },
+  "auditActions": {
+    "CREATE": "Create",
+    "UPDATE": "Update",
+    "DELETE": "Delete",
+    "LOGIN": "Sign-in",
+    "LOGOUT": "Sign-out",
+    "EXPORT": "Export"
+  },
+  "auditEntities": {
+    "roles": "Roles",
+    "users": "Accounts",
+    "refresh_tokens": "Sessions"
   }
 }

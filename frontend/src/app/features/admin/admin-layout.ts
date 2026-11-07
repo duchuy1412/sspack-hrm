@@ -28,6 +28,14 @@ import { HasPermissionDirective } from '../../core/auth/has-permission.directive
         ariaCurrentWhenActive="page"
         >{{ 'admin.tabs.users' | transloco }}</a
       >
+      <a
+        *hrmHasPermission="'audit:read'"
+        class="tab"
+        routerLink="audit"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+        >{{ 'admin.tabs.audit' | transloco }}</a
+      >
     </nav>
     <router-outlet />
   `,

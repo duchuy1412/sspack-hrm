@@ -5,10 +5,17 @@ import { AuthService } from '../../core/auth/auth.service';
 import { requireAnyPermission } from '../../core/auth/permission.guard';
 
 /** Vào /admin: mở tab đầu tiên người dùng có quyền. */
-const firstAdminTab: RedirectFunction = () =>
-  inject(AuthService).hasPermission('role:manage') ? 'roles' : 'users';
+const firstAdminTab: RedirectFunction = () => {
+  const auth = inject(AuthService);
+  if (auth.hasPermission('role:manage')) {
+    return 'roles';
+  }
+  return auth.hasPermission('user:manage') ? 'users' : 'audit';
+};
 
-/** Phân hệ Quản trị (PLT-03): vai trò và gán vai trò cho tài khoản. Lazy-load từ app.routes.ts. */
+/**
+ * Phân hệ Quản trị: vai trò và gán vai trò (PLT-03), nhật ký thao tác (PLT-04). Lazy-load từ app.routes.ts.
+ */
 export default [
   {
     path: '',
@@ -34,6 +41,11 @@ export default [
         path: 'users',
         canActivate: [requireAnyPermission('user:manage')],
         loadComponent: () => import('./users/users-page').then((m) => m.UsersPage),
+      },
+      {
+        path: 'audit',
+        canActivate: [requireAnyPermission('audit:read')],
+        loadComponent: () => import('./audit/audit-page').then((m) => m.AuditPage),
       },
     ],
   },

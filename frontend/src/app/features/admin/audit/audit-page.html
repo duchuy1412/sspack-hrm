@@ -1,0 +1,201 @@
+<p class="muted">{{ 'admin.audit.intro' | transloco }}</p>
+
+<form class="card filters" [formGroup]="filters" (ngSubmit)="apply()">
+  <div class="field">
+    <label class="field-label" for="audit-from">{{ 'admin.audit.filters.from' | transloco }}</label>
+    <input id="audit-from" type="date" formControlName="from" />
+  </div>
+  <div class="field">
+    <label class="field-label" for="audit-to">{{ 'admin.audit.filters.to' | transloco }}</label>
+    <input id="audit-to" type="date" formControlName="to" />
+  </div>
+  <div class="field">
+    <label class="field-label" for="audit-user">{{ 'admin.audit.filters.user' | transloco }}</label>
+    <select id="audit-user" formControlName="userId">
+      <option value="">{{ 'admin.audit.filters.all' | transloco }}</option>
+      @for (actor of actors(); track actor.id) {
+        <option [value]="actor.id">{{ actor.email }}</option>
+      }
+    </select>
+  </div>
+  <div class="field">
+    <label class="field-label" for="audit-entity">{{
+      'admin.audit.filters.entity' | transloco
+    }}</label>
+    <select id="audit-entity" formControlName="entityType">
+      <option value="">{{ 'admin.audit.filters.all' | transloco }}</option>
+      @for (entity of entities; track entity) {
+        <option [value]="entity">{{ 'auditEntities.' + entity | transloco }}</option>
+      }
+    </select>
+  </div>
+  <div class="field">
+    <label class="field-label" for="audit-action">{{
+      'admin.audit.filters.action' | transloco
+    }}</label>
+    <select id="audit-action" formControlName="action">
+      <option value="">{{ 'admin.audit.filters.all' | transloco }}</option>
+      @for (action of actions; track action) {
+        <option [value]="action">{{ 'auditActions.' + action | transloco }}</option>
+      }
+    </select>
+  </div>
+  <div class="filter-actions">
+    <button type="button" class="btn" (click)="reset()">
+      {{ 'admin.audit.filters.reset' | transloco }}
+    </button>
+    <button type="submit" class="btn btn-primary">
+      {{ 'admin.audit.filters.apply' | transloco }}
+    </button>
+  </div>
+</form>
+
+@if (error(); as message) {
+  <p class="alert" role="alert">{{ message }}</p>
+}
+
+<section class="card table-wrap" [attr.aria-busy]="loading()">
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">{{ 'admin.audit.columns.time' | transloco }}</th>
+        <th scope="col">{{ 'admin.audit.columns.user' | transloco }}</th>
+        <th scope="col">{{ 'admin.audit.columns.action' | transloco }}</th>
+        <th scope="col">{{ 'admin.audit.columns.entity' | transloco }}</th>
+        <th scope="col">{{ 'admin.audit.columns.ip' | transloco }}</th>
+        <th scope="col">
+          <span class="visually-hidden">{{ 'admin.audit.columns.details' | transloco }}</span>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (entry of page()?.content ?? []; track entry.id) {
+        <tr>
+          <td class="time">{{ entry.createdAt | date: 'dd/MM/yyyy HH:mm:ss' : '+0700' }}</td>
+          <td>{{ entry.userEmail ?? ('admin.audit.system' | transloco) }}</td>
+          <td>
+            <span class="chip" [attr.data-action]="entry.action">
+              {{ 'auditActions.' + entry.action | transloco }}
+            </span>
+          </td>
+          <td>
+            {{ 'auditEntities.' + entry.entityType | transloco }}
+            @if (entry.entityId !== null) {
+              <span class="muted">#{{ entry.entityId }}</span>
+            }
+          </td>
+          <td class="muted">{{ entry.ipAddress ?? '—' }}</td>
+          <td class="row-action">
+            <button type="button" class="link-button" (click)="open(entry)">
+              {{ 'admin.audit.viewDetails' | transloco }}
+            </button>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="6" class="muted">
+            {{ (loading() ? 'admin.loading' : 'admin.audit.empty') | transloco }}
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</section>
+
+@if (page(); as p) {
+  @if (p.totalPages > 1) {
+    <nav class="pager" [attr.aria-label]="'admin.pager.label' | transloco">
+      <span class="muted">{{ 'admin.audit.total' | transloco: { count: p.totalElements } }}</span>
+      <button type="button" class="btn" [disabled]="p.page === 0" (click)="goTo(p.page - 1)">
+        {{ 'admin.pager.previous' | transloco }}
+      </button>
+      <span class="muted">{{
+        'admin.pager.status' | transloco: { page: p.page + 1, total: p.totalPages }
+      }}</span>
+      <button
+        type="button"
+        class="btn"
+        [disabled]="p.page + 1 >= p.totalPages"
+        (click)="goTo(p.page + 1)"
+      >
+        {{ 'admin.pager.next' | transloco }}
+      </button>
+    </nav>
+  }
+}
+
+<dialog #dialog class="dialog card" aria-labelledby="audit-detail-title" (cancel)="close()">
+  @if (selected(); as entry) {
+    <div class="dialog-body">
+      <h2 id="audit-detail-title" class="heading">
+        {{ 'auditActions.' + entry.action | transloco }} ·
+        {{ 'auditEntities.' + entry.entityType | transloco }}
+        @if (entry.entityId !== null) {
+          #{{ entry.entityId }}
+        }
+      </h2>
+      <dl class="meta">
+        <dt>{{ 'admin.audit.columns.time' | transloco }}</dt>
+        <dd>{{ entry.createdAt | date: 'dd/MM/yyyy HH:mm:ss' : '+0700' }}</dd>
+        <dt>{{ 'admin.audit.columns.user' | transloco }}</dt>
+        <dd>{{ entry.userEmail ?? ('admin.audit.system' | transloco) }}</dd>
+        <dt>{{ 'admin.audit.columns.entity' | transloco }}</dt>
+        <dd>
+          <code>{{ entry.entityType }}</code>
+        </dd>
+        <dt>{{ 'admin.audit.columns.ip' | transloco }}</dt>
+        <dd>{{ entry.ipAddress ?? '—' }}</dd>
+      </dl>
+
+      <div class="table-wrap">
+        <table class="diff">
+          <thead>
+            <tr>
+              <th scope="col">{{ 'admin.audit.diff.field' | transloco }}</th>
+              <th scope="col">{{ 'admin.audit.diff.before' | transloco }}</th>
+              <th scope="col">{{ 'admin.audit.diff.after' | transloco }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of diff(); track row.field) {
+              <tr [class.changed]="row.changed">
+                <th scope="row">
+                  <code>{{ row.field }}</code>
+                  @if (row.changed) {
+                    <span class="changed-tag">{{ 'admin.audit.diff.changed' | transloco }}</span>
+                  }
+                </th>
+                <td>{{ format(row.before) }}</td>
+                <td>
+                  @if (row.added.length || row.removed.length) {
+                    <ul class="delta">
+                      @for (item of row.added; track $index) {
+                        <li class="added">+ {{ format(item) }}</li>
+                      }
+                      @for (item of row.removed; track $index) {
+                        <li class="removed">− {{ format(item) }}</li>
+                      }
+                    </ul>
+                    <span class="muted">{{ format(row.after) }}</span>
+                  } @else {
+                    {{ format(row.after) }}
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="3" class="muted">{{ 'admin.audit.diff.empty' | transloco }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="dialog-actions">
+        <button type="button" class="btn" (click)="close()">
+          {{ 'admin.audit.close' | transloco }}
+        </button>
+      </div>
+    </div>
+  }
+</dialog>

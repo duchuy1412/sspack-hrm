@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import vn.sspack.hrm.platform.application.audit.AuditEntity;
 import vn.sspack.hrm.platform.application.audit.AuditLogService;
 import vn.sspack.hrm.platform.application.audit.AuditLogService.Action;
 import vn.sspack.hrm.platform.application.rbac.RbacViews.Actor;
@@ -34,7 +35,6 @@ import vn.sspack.hrm.platform.infrastructure.persistence.UserAccountRepository;
 @Service
 public class UserRoleService {
 
-    static final String ENTITY_USER = "user";
 
     private final UserAccountRepository users;
     private final RoleRepository roles;
@@ -73,7 +73,7 @@ public class UserRoleService {
         Map<String, Object> before = snapshot(user);
         user.assignRoles(newRoles, user.getId() == actor.userId(), OffsetDateTime.now(clock));
         users.flush();
-        audit.record(actor.companyId(), actor.userId(), Action.UPDATE, ENTITY_USER, user.getId(), before,
+        audit.record(actor.companyId(), actor.userId(), Action.UPDATE, AuditEntity.USERS, user.getId(), before,
                 snapshot(user), actor.ipAddress());
         return toView(user);
     }

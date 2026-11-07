@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import vn.sspack.hrm.platform.application.audit.AuditEntity;
 import vn.sspack.hrm.platform.application.audit.AuditLogService;
 import vn.sspack.hrm.platform.application.audit.AuditLogService.Action;
 import vn.sspack.hrm.platform.application.rbac.RbacViews.Actor;
@@ -36,7 +37,6 @@ import vn.sspack.hrm.platform.infrastructure.persistence.RoleRepository;
 @Service
 public class RoleService {
 
-    static final String ENTITY_ROLE = "role";
     /** Vai trò hệ thống lên trước, sau đó theo mã. */
     static final Sort ROLE_ORDER = Sort.by(Sort.Order.desc("system"), Sort.Order.asc("code"));
 
@@ -84,7 +84,7 @@ public class RoleService {
             throw RbacErrors.roleCodeExists(role.getCode());
         }
         role = roles.saveAndFlush(role);
-        audit.record(actor.companyId(), actor.userId(), Action.CREATE, ENTITY_ROLE, role.getId(), null,
+        audit.record(actor.companyId(), actor.userId(), Action.CREATE, AuditEntity.ROLES, role.getId(), null,
                 snapshot(role), actor.ipAddress());
         return toDetail(role, 0);
     }
@@ -99,7 +99,7 @@ public class RoleService {
         role.update(command.name(), command.description(), command.dataScope(),
                 resolvePermissions(command.permissions()), now());
         roles.flush();
-        audit.record(actor.companyId(), actor.userId(), Action.UPDATE, ENTITY_ROLE, role.getId(), before,
+        audit.record(actor.companyId(), actor.userId(), Action.UPDATE, AuditEntity.ROLES, role.getId(), before,
                 snapshot(role), actor.ipAddress());
         return toDetail(role, roles.countAssignedUsers(role.getId()));
     }
@@ -110,7 +110,7 @@ public class RoleService {
         role.ensureDeletable(roles.countAssignedUsers(role.getId()));
         Map<String, Object> before = snapshot(role);
         roles.delete(role);
-        audit.record(actor.companyId(), actor.userId(), Action.DELETE, ENTITY_ROLE, roleId, before, null,
+        audit.record(actor.companyId(), actor.userId(), Action.DELETE, AuditEntity.ROLES, roleId, before, null,
                 actor.ipAddress());
     }
 

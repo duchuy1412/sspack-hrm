@@ -2,7 +2,9 @@ package vn.sspack.hrm.platform.application.audit;
 
 import java.time.Clock;
 import java.time.OffsetDateTime;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,12 +16,16 @@ import vn.sspack.hrm.platform.infrastructure.persistence.AuditLogJdbcRepository;
 
 /**
  * Ghi nhật ký thao tác (bảng {@code audit_logs}). Chạy trong transaction của nghiệp vụ gọi nó để nhật ký
- * và dữ liệu cùng commit hoặc cùng rollback. Màn xem nhật ký là PLT-04.
+ * và dữ liệu cùng commit hoặc cùng rollback. Màn xem nhật ký: {@link AuditLogQueryService} (PLT-04).
  */
 @Service
 public class AuditLogService {
 
-    public enum Action { CREATE, UPDATE, DELETE, LOGIN, EXPORT }
+    public enum Action { CREATE, UPDATE, DELETE, LOGIN, LOGOUT, EXPORT }
+
+    /** Khóa không bao giờ được vào nhật ký: người có quyền audit:read đọc được mọi giá trị trước/sau. */
+    static final Set<String> FORBIDDEN_KEYS = Set.of("password", "passwordhash", "password_hash", "token",
+            "tokenhash", "token_hash", "refreshtoken", "secret");
 
     private final AuditLogJdbcRepository repository;
     private final ObjectMapper objectMapper;
@@ -32,10 +38,23 @@ public class AuditLogService {
     }
 
     @Transactional(propagation = Propagation.MANDATORY)
-    public void record(long companyId, Long userId, Action action, String entityType, Long entityId,
+    public void record(long companyId, Long userId, Action action, AuditEntity entity, Long entityId,
                        Map<String, ?> oldValue, Map<String, ?> newValue, String ipAddress) {
-        repository.insert(companyId, userId, action.name(), entityType, entityId,
+        rejectSecrets(oldValue);
+        rejectSecrets(newValue);
+        repository.insert(companyId, userId, action.name(), entity.table(), entityId,
                 toJson(oldValue), toJson(newValue), ipAddress, OffsetDateTime.now(clock));
+    }
+
+    private static void rejectSecrets(Map<String, ?> value) {
+        if (value == null) {
+            return;
+        }
+        for (String key : value.keySet()) {
+            if (FORBIDDEN_KEYS.contains(key.toLowerCase(Locale.ROOT))) {
+                throw new IllegalArgumentException("Không ghi bí mật vào audit log: " + key);
+            }
+        }
     }
 
     private String toJson(Map<String, ?> value) {
