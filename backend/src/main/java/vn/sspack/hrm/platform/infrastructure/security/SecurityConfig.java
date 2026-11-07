@@ -68,6 +68,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                        // Chặn sớm ở tầng URL (kèm @PreAuthorize ở controller): kiểm tra quyền trước khi
+                        // validate body, để người không có quyền nhận 403 chứ không thấy lỗi từng trường.
+                        .requestMatchers("/api/v1/roles", "/api/v1/roles/**", "/api/v1/permissions")
+                        .hasAuthority("role:manage")
+                        .requestMatchers("/api/v1/users", "/api/v1/users/**").hasAuthority("user:manage")
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(o -> o
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(SecurityConfig::toAuthentication))

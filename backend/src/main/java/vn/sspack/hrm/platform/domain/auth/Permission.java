@@ -28,6 +28,15 @@ public class Permission {
     protected Permission() {
     }
 
+    /** Dùng cho test: danh mục quyền thật nạp từ migration. */
+    public static Permission of(String code, String module, String description) {
+        Permission permission = new Permission();
+        permission.code = code;
+        permission.module = module;
+        permission.description = description;
+        return permission;
+    }
+
     public Long getId() {
         return id;
     }

@@ -1,0 +1,167 @@
+<div class="toolbar">
+  <h2 class="heading">
+    {{ (isNew() ? 'admin.roles.createTitle' : 'admin.roles.editTitle') | transloco }}
+    @if (role()?.system) {
+      <span class="chip chip-brand">{{ 'admin.roles.system' | transloco }}</span>
+    }
+  </h2>
+  <a class="link-button" routerLink="/admin/roles">{{ 'admin.roles.backToList' | transloco }}</a>
+</div>
+
+@if (error(); as message) {
+  <p class="alert" role="alert">{{ message }}</p>
+}
+
+@if (loading()) {
+  <p class="muted">{{ 'admin.loading' | transloco }}</p>
+} @else {
+  <form class="editor" [formGroup]="form" (ngSubmit)="save()" novalidate>
+    <section class="card section">
+      <h3 class="subheading">{{ 'admin.roles.generalSection' | transloco }}</h3>
+
+      <div class="grid">
+        <div class="field">
+          <label class="field-label" for="role-code">{{
+            'admin.roles.fields.code' | transloco
+          }}</label>
+          <input
+            id="role-code"
+            type="text"
+            formControlName="code"
+            autocomplete="off"
+            [attr.aria-invalid]="fieldError('code') ? true : null"
+            aria-describedby="role-code-hint"
+          />
+          @if (fieldError('code'); as message) {
+            <span class="field-error">{{ message }}</span>
+          } @else {
+            <span id="role-code-hint" class="muted">{{
+              'admin.roles.hints.code' | transloco
+            }}</span>
+          }
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="role-name">{{
+            'admin.roles.fields.name' | transloco
+          }}</label>
+          <input
+            id="role-name"
+            type="text"
+            formControlName="name"
+            [attr.aria-invalid]="fieldError('name') ? true : null"
+          />
+          @if (fieldError('name'); as message) {
+            <span class="field-error">{{ message }}</span>
+          }
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="role-scope">{{
+            'admin.roles.fields.dataScope' | transloco
+          }}</label>
+          <select id="role-scope" formControlName="dataScope">
+            @for (scope of scopes; track scope) {
+              <option [value]="scope">{{ 'dataScope.' + scope | transloco }}</option>
+            }
+          </select>
+          <span class="muted">{{
+            (role()?.system ? 'admin.roles.hints.systemScope' : 'admin.roles.hints.dataScope')
+              | transloco
+          }}</span>
+        </div>
+
+        <div class="field span-2">
+          <label class="field-label" for="role-description">{{
+            'admin.roles.fields.description' | transloco
+          }}</label>
+          <textarea
+            id="role-description"
+            rows="2"
+            formControlName="description"
+            [attr.aria-invalid]="fieldError('description') ? true : null"
+          ></textarea>
+          @if (fieldError('description'); as message) {
+            <span class="field-error">{{ message }}</span>
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="card section" aria-labelledby="permissions-title">
+      <div class="section-header">
+        <h3 id="permissions-title" class="subheading">
+          {{ 'admin.roles.permissionsSection' | transloco }}
+        </h3>
+        <span class="muted">{{
+          'admin.roles.selectedCount' | transloco: { count: selected().size }
+        }}</span>
+      </div>
+      @if (permissionsMissing()) {
+        <p class="field-error" role="alert">
+          {{ 'admin.roles.validation.permissionsRequired' | transloco }}
+        </p>
+      }
+      @if (isAdminRole()) {
+        <p class="notice">{{ 'admin.roles.hints.adminLocked' | transloco }}</p>
+      }
+
+      <div class="groups">
+        @for (group of groups(); track group.module) {
+          <fieldset class="group">
+            <legend>
+              <label class="check group-check">
+                <input
+                  type="checkbox"
+                  [checked]="groupState(group) === 'all'"
+                  [indeterminate]="groupState(group) === 'some'"
+                  (change)="toggleGroup(group, $any($event.target).checked)"
+                />
+                <span>{{ 'permissionModules.' + group.module | transloco }}</span>
+              </label>
+            </legend>
+            @for (permission of group.permissions; track permission.code) {
+              <label class="check">
+                <input
+                  type="checkbox"
+                  [checked]="isChecked(permission.code)"
+                  [disabled]="isLocked(permission.code)"
+                  (change)="toggle(permission.code, $any($event.target).checked)"
+                />
+                <span class="permission">
+                  <span>{{ permission.description }}</span>
+                  <code class="muted">{{ permission.code }}</code>
+                </span>
+              </label>
+            }
+          </fieldset>
+        }
+      </div>
+    </section>
+
+    <div class="actions">
+      @if (role(); as current) {
+        @if (!current.system) {
+          <button
+            type="button"
+            class="btn btn-danger"
+            [disabled]="saving() || current.assignedUserCount > 0"
+            (click)="remove()"
+          >
+            {{ 'admin.roles.delete' | transloco }}
+          </button>
+          @if (current.assignedUserCount > 0) {
+            <span class="muted">{{
+              'admin.roles.hints.inUse' | transloco: { count: current.assignedUserCount }
+            }}</span>
+          }
+        }
+      }
+      <span class="spacer"></span>
+      <a class="btn" routerLink="/admin/roles">{{ 'admin.cancel' | transloco }}</a>
+      <button type="submit" class="btn btn-primary" [disabled]="saving()">
+        {{ (saving() ? 'admin.saving' : 'admin.save') | transloco }}
+      </button>
+    </div>
+  </form>
+}

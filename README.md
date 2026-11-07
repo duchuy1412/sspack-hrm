@@ -119,6 +119,8 @@ Profile `dev` nạp thêm tài khoản dùng thử (`db/dev/R__demo_users.sql`),
 
 Đăng nhập (PLT-01): access token JWT 15 phút trả trong body và chỉ giữ trong bộ nhớ trình duyệt; refresh token 7 ngày nằm trong cookie `HttpOnly; SameSite=Strict`, xoay vòng mỗi lần làm mới. Sai mật khẩu 5 lần liên tiếp thì tài khoản bị khóa 15 phút.
 
+Phân quyền (PLT-03): Admin vào **Quản trị → Vai trò** để tạo vai trò, chọn quyền theo chức năng (`module:action`) và phạm vi dữ liệu; tab **Gán vai trò** gán vai trò cho tài khoản. Quyền được kiểm tra ở API (`@PreAuthorize` và chặn theo URL) lẫn giao diện (ẩn menu, chặn route, ẩn nút). Quyền nằm trong access token nên thay đổi có hiệu lực với người đang đăng nhập ở lần làm mới token kế tiếp, **tối đa 15 phút**; khi đó giao diện tự nạp lại quyền. Vai trò hệ thống không xóa được, không đổi phạm vi dữ liệu; vai trò Admin luôn giữ `role:manage`; Admin không tự gỡ quyền quản lý tài khoản của mình.
+
 ### 3. Frontend
 
 ```bash

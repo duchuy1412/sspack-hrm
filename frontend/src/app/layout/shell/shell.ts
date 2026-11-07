@@ -10,7 +10,7 @@ import { NAV_ITEMS } from '../nav-items';
 const ROLE_PRIORITY = ['ADMIN', 'HR', 'MANAGER', 'INTERVIEWER', 'EMPLOYEE'];
 
 /**
- * Khung trang chính: thanh điều hướng bên trái theo mockup (logo, 9 phân hệ, khối người dùng ở đáy)
+ * Khung trang chính: thanh điều hướng bên trái theo mockup (logo, các phân hệ được phép, khối người dùng ở đáy)
  * và vùng nội dung. Trên màn hình hẹp, thanh bên trượt ra từ nút menu.
  */
 @Component({
@@ -24,7 +24,10 @@ export class Shell {
   private readonly transloco = inject(TranslocoService);
   protected readonly auth = inject(AuthService);
 
-  protected readonly navItems = NAV_ITEMS;
+  /** PLT-03: chỉ hiện phân hệ người dùng có quyền; tự cập nhật khi quyền đổi sau lần làm mới token. */
+  protected readonly navItems = computed(() =>
+    NAV_ITEMS.filter((item) => this.auth.hasAnyPermission(item.permissions)),
+  );
   protected readonly langs = AVAILABLE_LANGS;
   protected readonly activeLang = signal<AppLang>(this.transloco.getActiveLang() as AppLang);
   protected readonly menuOpen = signal(false);

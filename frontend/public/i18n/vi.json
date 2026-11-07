@@ -14,7 +14,8 @@
     "attendance": "Chấm công",
     "payroll": "Tính lương",
     "recruitment": "Tuyển dụng",
-    "reports": "Báo cáo"
+    "reports": "Báo cáo",
+    "admin": "Quản trị"
   },
   "language": {
     "label": "Ngôn ngữ",
@@ -70,5 +71,130 @@
     "MANAGER": "Quản lý trực tiếp",
     "EMPLOYEE": "Nhân viên",
     "INTERVIEWER": "Người phỏng vấn"
+  },
+  "forbidden": {
+    "title": "Không có quyền truy cập",
+    "message": "Tài khoản của bạn không được phép mở trang này. Nếu cần, hãy liên hệ quản trị hệ thống để được cấp quyền.",
+    "back": "Về trang chính"
+  },
+  "dataScope": {
+    "ALL": "Toàn công ty",
+    "DEPARTMENT_TREE": "Phòng ban mình và cấp dưới",
+    "DEPARTMENT": "Chỉ phòng ban mình",
+    "SELF": "Chỉ bản thân",
+    "ASSIGNED": "Đối tượng được giao"
+  },
+  "permissionModules": {
+    "platform": "Nền tảng",
+    "org": "Cơ cấu tổ chức",
+    "employee": "Hồ sơ nhân viên",
+    "leave": "Nghỉ phép",
+    "attendance": "Chấm công",
+    "payroll": "Tính lương",
+    "recruitment": "Tuyển dụng",
+    "dashboard": "Tổng quan"
+  },
+  "admin": {
+    "title": "Quản trị",
+    "loading": "Đang tải…",
+    "save": "Lưu",
+    "saving": "Đang lưu…",
+    "cancel": "Hủy",
+    "tabs": {
+      "roles": "Vai trò",
+      "users": "Gán vai trò"
+    },
+    "pager": {
+      "label": "Phân trang",
+      "previous": "Trang trước",
+      "next": "Trang sau",
+      "status": "Trang {{page}}/{{total}}"
+    },
+    "roles": {
+      "intro": "Mỗi vai trò gồm các quyền theo chức năng và một phạm vi dữ liệu. Thay đổi có hiệu lực khi người dùng làm mới phiên (tối đa 15 phút).",
+      "add": "Thêm vai trò",
+      "empty": "Chưa có vai trò nào.",
+      "system": "Hệ thống",
+      "custom": "Tùy chỉnh",
+      "columns": {
+        "name": "Vai trò",
+        "dataScope": "Phạm vi dữ liệu",
+        "permissions": "Số quyền",
+        "users": "Người dùng",
+        "type": "Loại",
+        "updatedAt": "Cập nhật"
+      },
+      "createTitle": "Thêm vai trò",
+      "editTitle": "Sửa vai trò",
+      "backToList": "Quay lại danh sách",
+      "generalSection": "Thông tin chung",
+      "permissionsSection": "Quyền theo chức năng",
+      "selectedCount": "Đã chọn {{count}} quyền",
+      "fields": {
+        "code": "Mã vai trò",
+        "name": "Tên vai trò",
+        "dataScope": "Phạm vi dữ liệu",
+        "description": "Mô tả"
+      },
+      "hints": {
+        "code": "Chữ in hoa, số hoặc dấu gạch dưới, vd TRUONG_CA. Không đổi được sau khi tạo.",
+        "dataScope": "Giới hạn dữ liệu người có vai trò này được xem và thao tác.",
+        "systemScope": "Vai trò hệ thống giữ cố định phạm vi dữ liệu.",
+        "adminLocked": "Vai trò Quản trị hệ thống luôn giữ quyền quản lý vai trò để không ai bị khóa khỏi màn hình này.",
+        "inUse": "Đang gán cho {{count}} người dùng, gỡ vai trò khỏi họ trước khi xóa."
+      },
+      "validation": {
+        "codeRequired": "Vui lòng nhập mã vai trò",
+        "codePattern": "Mã gồm 2–50 ký tự: chữ, số hoặc dấu gạch dưới, bắt đầu bằng chữ cái",
+        "nameRequired": "Vui lòng nhập tên vai trò",
+        "dataScopeRequired": "Vui lòng chọn phạm vi dữ liệu",
+        "descriptionRequired": "Vui lòng nhập mô tả",
+        "tooLong": "Tối đa {{max}} ký tự",
+        "permissionsRequired": "Vui lòng chọn ít nhất một quyền."
+      },
+      "delete": "Xóa vai trò",
+      "confirmDelete": "Xóa vai trò \"{{name}}\"? Thao tác này không hoàn tác được."
+    },
+    "users": {
+      "search": "Tìm tài khoản",
+      "searchPlaceholder": "Nhập email",
+      "effectNote": "Vai trò mới có hiệu lực khi người dùng làm mới phiên (tối đa 15 phút).",
+      "columns": {
+        "email": "Email",
+        "status": "Trạng thái",
+        "roles": "Vai trò",
+        "actions": "Thao tác"
+      },
+      "status": {
+        "ACTIVE": "Đang hoạt động",
+        "LOCKED": "Đã khóa",
+        "DISABLED": "Vô hiệu hóa"
+      },
+      "assign": "Gán vai trò",
+      "empty": "Không tìm thấy tài khoản nào.",
+      "dialogTitle": "Gán vai trò",
+      "saved": "Đã cập nhật vai trò cho {{email}}.",
+      "validation": {
+        "roleRequired": "Người dùng phải có ít nhất một vai trò."
+      }
+    },
+    "errors": {
+      "generic": "Không thực hiện được thao tác. Vui lòng thử lại.",
+      "network": "Không kết nối được máy chủ. Vui lòng kiểm tra mạng và thử lại.",
+      "FORBIDDEN": "Bạn không có quyền thực hiện thao tác này.",
+      "CONCURRENT_MODIFICATION": "Dữ liệu vừa được người khác thay đổi. Vui lòng tải lại trang và thử lại.",
+      "ROLE_NOT_FOUND": "Không tìm thấy vai trò.",
+      "USER_NOT_FOUND": "Không tìm thấy người dùng.",
+      "ROLE_CODE_EXISTS": "Mã vai trò đã tồn tại.",
+      "ROLE_CODE_INVALID": "Mã vai trò không hợp lệ.",
+      "ROLE_NO_PERMISSION": "Vai trò phải có ít nhất một quyền.",
+      "ROLE_ADMIN_MUST_MANAGE_ROLES": "Vai trò Quản trị hệ thống phải giữ quyền quản lý vai trò.",
+      "ROLE_SYSTEM_SCOPE_LOCKED": "Không thể đổi phạm vi dữ liệu của vai trò hệ thống.",
+      "ROLE_SYSTEM_NOT_DELETABLE": "Không thể xóa vai trò hệ thống.",
+      "ROLE_IN_USE": "Vai trò đang được gán cho {{assignedUserCount}} người dùng. Hãy gỡ vai trò khỏi họ trước khi xóa.",
+      "USER_NO_ROLE": "Người dùng phải có ít nhất một vai trò.",
+      "USER_SELF_LOCKOUT": "Bạn không thể tự gỡ vai trò đang cho phép mình quản lý tài khoản.",
+      "VALIDATION_FAILED": "Vui lòng kiểm tra lại các trường được đánh dấu."
+    }
   }
 }

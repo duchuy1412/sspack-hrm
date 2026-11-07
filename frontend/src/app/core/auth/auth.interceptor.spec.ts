@@ -70,6 +70,18 @@ describe('authInterceptor', () => {
     retried.flush([{ id: 1 }]);
 
     expect(body).toEqual([{ id: 1 }]);
+
+    // PLT-03: token mới có thể mang quyền mới (Admin vừa đổi vai trò) nên nạp lại /me
+    const me = http.expectOne(`${AUTH_API}/me`);
+    expect(me.request.headers.get('Authorization')).toBe('Bearer jwt-new');
+    me.flush({
+      id: 1,
+      email: 'a@sspack.vn',
+      preferredLocale: 'vi',
+      roles: [],
+      permissions: ['leave:approve'],
+    });
+    expect(auth.hasPermission('leave:approve')).toBe(true);
   });
 
   it('làm mới thất bại: kết thúc phiên và chuyển về đăng nhập', async () => {

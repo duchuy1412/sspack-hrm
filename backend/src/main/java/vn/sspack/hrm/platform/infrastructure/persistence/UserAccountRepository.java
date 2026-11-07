@@ -3,6 +3,8 @@ package vn.sspack.hrm.platform.infrastructure.persistence;
 import java.util.Optional;
 
 import jakarta.persistence.LockModeType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -20,6 +22,17 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, Long> 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select u from UserAccount u where lower(u.email) = lower(:email)")
     Optional<UserAccount> findForLogin(@Param("email") String email);
+
+    /** Danh sách tài khoản của công ty, lọc theo email chứa {@code q} (không phân biệt hoa thường). */
+    @Query("""
+            select u from UserAccount u
+            where u.companyId = :companyId
+              and (:q = '' or lower(u.email) like lower(concat('%', :q, '%')))
+            """)
+    Page<UserAccount> search(@Param("companyId") Long companyId, @Param("q") String q, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"roles", "roles.permissions"})
+    Optional<UserAccount> findWithRolesByIdAndCompanyId(Long id, Long companyId);
 
     /** Nạp tài khoản kèm vai trò và quyền để phát hành token. */
     @EntityGraph(attributePaths = {"roles", "roles.permissions"})
