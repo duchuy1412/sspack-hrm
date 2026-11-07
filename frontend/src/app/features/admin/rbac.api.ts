@@ -63,7 +63,8 @@ export class RbacApi {
 export class RbacErrorMessages {
   private readonly transloco = inject(TranslocoService);
 
-  describe(err: unknown): string {
+  /** @param prefixes nhóm chuỗi i18n tra mã lỗi theo thứ tự, vd `['org.errors', 'admin.errors']` */
+  describe(err: unknown, prefixes: readonly string[] = ['admin.errors']): string {
     if (!(err instanceof HttpErrorResponse)) {
       return this.transloco.translate('admin.errors.generic');
     }
@@ -71,14 +72,16 @@ export class RbacErrorMessages {
       return this.transloco.translate('admin.errors.network');
     }
     const problem = err.error as ApiProblem | null;
-    const key = problem?.code ? `admin.errors.${problem.code}` : null;
-    if (key) {
-      const translated = this.transloco.translate(
-        key,
-        problem as unknown as Record<string, unknown>,
-      );
-      if (translated !== key) {
-        return translated;
+    if (problem?.code) {
+      for (const prefix of prefixes) {
+        const key = `${prefix}.${problem.code}`;
+        const translated = this.transloco.translate(
+          key,
+          problem as unknown as Record<string, unknown>,
+        );
+        if (translated !== key) {
+          return translated;
+        }
       }
     }
     return problem?.detail ?? this.transloco.translate('admin.errors.generic');

@@ -12,7 +12,7 @@ import { RoleSummary } from '../rbac.models';
   selector: 'hrm-roles-page',
   imports: [RouterLink, TranslocoPipe, DatePipe, HasPermissionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['../admin-shared.scss'],
+  styleUrls: ['../../../shared/ui/page-shared.scss'],
   template: `
     <div class="toolbar">
       <p class="muted">{{ 'admin.roles.intro' | transloco }}</p>

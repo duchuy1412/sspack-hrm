@@ -123,6 +123,8 @@ Phân quyền (PLT-03): Admin vào **Quản trị → Vai trò** để tạo vai
 
 Nhật ký thao tác (PLT-04): **Quản trị → Nhật ký** (quyền `audit:read`) lọc theo khoảng ngày, người thực hiện, bảng, hành động; mỗi dòng mở ra so sánh giá trị trước/sau. Bảng `audit_logs` chỉ thêm dòng (trigger chặn UPDATE, DELETE, TRUNCATE). Test kiến trúc `AuditCoverageTest` bắt buộc mọi method `@Transactional` ghi dữ liệu trong tầng `application` gọi `AuditLogService.record` hoặc ghi rõ lý do bằng `@NoAudit("…")`; `AuditLogService` từ chối snapshot chứa mật khẩu hay token.
 
+Cây phòng ban (ORG-01): mục **Cơ cấu tổ chức** hiện cây nhiều cấp cho mọi người dùng (`org:read`); HR (`org:manage`) thêm, sửa, kéo một phòng ban thả lên phòng ban khác để đổi cấp trên (hoặc dùng **Chuyển đến…** bằng bàn phím, trên điện thoại). Cây lưu bằng materialized path (`/1/4/12/`); chuyển một nhánh cập nhật path cả nhánh trong một transaction và không cho chuyển vào chính nó hay cấp dưới của nó. **Xóa** chỉ dành cho phòng ban chưa có cấp dưới và chưa từng có nhân viên; phòng ban giải thể dùng **Ngừng hoạt động** (khi không còn nhân viên đang làm và cấp dưới đang hoạt động) để giữ lịch sử. Profile `dev` nạp cây phòng ban mẫu (`db/dev/R__demo_departments.sql`).
+
 ### 3. Frontend
 
 ```bash

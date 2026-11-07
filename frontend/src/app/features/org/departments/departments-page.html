@@ -1,0 +1,252 @@
+<h1 class="display">{{ 'org.departments.title' | transloco }}</h1>
+
+<div class="toolbar">
+  <div class="field search">
+    <label class="field-label" for="dept-search">{{ 'org.departments.search' | transloco }}</label>
+    <input
+      id="dept-search"
+      type="search"
+      [ngModel]="query()"
+      (ngModelChange)="query.set($event)"
+      [placeholder]="'org.departments.searchPlaceholder' | transloco"
+    />
+  </div>
+  <label class="check">
+    <input
+      type="checkbox"
+      [checked]="includeInactive()"
+      (change)="toggleInactive($any($event.target).checked)"
+    />
+    <span>{{ 'org.departments.showInactive' | transloco }}</span>
+  </label>
+  @if (canManage()) {
+    <button type="button" class="btn btn-primary" (click)="openCreate(null)">
+      {{ 'org.departments.add' | transloco }}
+    </button>
+  }
+</div>
+
+@if (canManage()) {
+  <p class="muted">{{ 'org.departments.dragHint' | transloco }}</p>
+}
+@if (error(); as message) {
+  <p class="alert" role="alert">{{ message }}</p>
+}
+@if (notice(); as message) {
+  <p class="notice" role="status">{{ message }}</p>
+}
+
+@if (dragging()) {
+  <div
+    class="root-zone"
+    [class.drop-ok]="dropTarget() === 'root'"
+    [class.drop-blocked]="!canDropOn(null)"
+    (dragover)="onDragOver($event, null)"
+    (dragleave)="onDragLeave(null)"
+    (drop)="onDrop($event, null)"
+  >
+    {{ 'org.departments.dropToRoot' | transloco }}
+  </div>
+}
+
+<section class="card tree" [attr.aria-busy]="loading() || busy()">
+  @if (loading() && departments().length === 0) {
+    <p class="muted empty">{{ 'admin.loading' | transloco }}</p>
+  } @else if (tree().length === 0) {
+    <p class="muted empty">{{ 'org.departments.empty' | transloco }}</p>
+  } @else {
+    <ul role="tree" [attr.aria-label]="'org.departments.title' | transloco">
+      @for (node of tree(); track node.department.id) {
+        <ng-container *ngTemplateOutlet="nodeTpl; context: { $implicit: node }" />
+      }
+    </ul>
+  }
+</section>
+
+<ng-template #nodeTpl let-node>
+  @if (isVisible(node)) {
+    @let d = node.department;
+    <li
+      role="treeitem"
+      [attr.aria-expanded]="node.children.length ? isExpanded(node) : null"
+      [attr.aria-level]="d.depth"
+    >
+      <div
+        class="row"
+        [class.inactive]="!d.active"
+        [class.is-dragging]="dragging()?.id === d.id"
+        [class.drop-ok]="dropTarget() === d.id"
+        [class.drop-blocked]="dragging() !== null && !canDropOn(d)"
+        [attr.draggable]="canManage() && d.active"
+        [attr.data-id]="d.id"
+        (dragstart)="onDragStart($event, d)"
+        (dragend)="onDragEnd()"
+        (dragover)="onDragOver($event, d)"
+        (dragleave)="onDragLeave(d)"
+        (drop)="onDrop($event, d)"
+      >
+        @if (node.children.length) {
+          <button
+            type="button"
+            class="twisty"
+            [attr.aria-label]="
+              (isExpanded(node) ? 'org.departments.collapse' : 'org.departments.expand')
+                | transloco: { name: d.name }
+            "
+            (click)="toggle(node)"
+          >
+            <span aria-hidden="true">{{ isExpanded(node) ? '▾' : '▸' }}</span>
+          </button>
+        } @else {
+          <span class="twisty" aria-hidden="true"></span>
+        }
+        <div class="info">
+          <span class="dept-name">{{ d.name }}</span>
+          <span class="muted">
+            {{ d.code }} ·
+            {{ 'org.departments.employees' | transloco: { count: d.workingEmployeeCount } }}
+          </span>
+        </div>
+        @if (!d.active) {
+          <span class="chip">{{ 'org.departments.inactive' | transloco }}</span>
+        }
+        @if (canManage()) {
+          <div class="actions">
+            @if (d.active) {
+              <button type="button" class="link-button" (click)="openCreate(d)">
+                {{ 'org.departments.addChild' | transloco }}
+              </button>
+              <button type="button" class="link-button" (click)="openRename(d)">
+                {{ 'org.departments.edit' | transloco }}
+              </button>
+              <button type="button" class="link-button" (click)="openMove(d)">
+                {{ 'org.departments.moveTo' | transloco }}
+              </button>
+              <button type="button" class="link-button" (click)="setActive(d, false)">
+                {{ 'org.departments.deactivate' | transloco }}
+              </button>
+            } @else {
+              <button type="button" class="link-button" (click)="setActive(d, true)">
+                {{ 'org.departments.activate' | transloco }}
+              </button>
+            }
+            @if (d.childCount === 0 && d.employeeCount === 0) {
+              <button type="button" class="link-button danger" (click)="remove(d)">
+                {{ 'org.departments.delete' | transloco }}
+              </button>
+            }
+          </div>
+        }
+      </div>
+      @if (node.children.length && isExpanded(node)) {
+        <ul role="group">
+          @for (child of node.children; track child.department.id) {
+            <ng-container *ngTemplateOutlet="nodeTpl; context: { $implicit: child }" />
+          }
+        </ul>
+      }
+    </li>
+  }
+</ng-template>
+
+<dialog #editDialog class="dialog card" aria-labelledby="dept-edit-title" (cancel)="closeEdit()">
+  @if (editMode(); as mode) {
+    <form class="dialog-body" [formGroup]="form" (ngSubmit)="save()" novalidate>
+      <h2 id="dept-edit-title" class="heading">
+        {{
+          (mode.kind === 'create' ? 'org.departments.createTitle' : 'org.departments.editTitle')
+            | transloco
+        }}
+      </h2>
+      @if (mode.kind === 'create') {
+        <p class="muted">
+          {{ 'org.departments.parentLabel' | transloco }}:
+          {{ mode.parent?.name ?? ('org.departments.rootLevel' | transloco) }}
+        </p>
+      }
+      <div class="field">
+        <label class="field-label" for="dept-code">{{
+          'org.departments.fields.code' | transloco
+        }}</label>
+        <input
+          id="dept-code"
+          type="text"
+          formControlName="code"
+          autocomplete="off"
+          [attr.aria-invalid]="fieldError('code') ? true : null"
+        />
+        @if (fieldError('code'); as message) {
+          <span class="field-error">{{ message }}</span>
+        } @else {
+          <span class="muted">{{ 'org.departments.hints.code' | transloco }}</span>
+        }
+      </div>
+      <div class="field">
+        <label class="field-label" for="dept-name">{{
+          'org.departments.fields.name' | transloco
+        }}</label>
+        <input
+          id="dept-name"
+          type="text"
+          formControlName="name"
+          [attr.aria-invalid]="fieldError('name') ? true : null"
+        />
+        @if (fieldError('name'); as message) {
+          <span class="field-error">{{ message }}</span>
+        }
+      </div>
+      @if (dialogError(); as message) {
+        <p class="alert" role="alert">{{ message }}</p>
+      }
+      <div class="dialog-actions">
+        <button type="button" class="btn" (click)="closeEdit()">
+          {{ 'admin.cancel' | transloco }}
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="busy()">
+          {{ (busy() ? 'admin.saving' : 'admin.save') | transloco }}
+        </button>
+      </div>
+    </form>
+  }
+</dialog>
+
+<dialog #moveDialog class="dialog card" aria-labelledby="dept-move-title" (cancel)="closeMove()">
+  @if (moving(); as d) {
+    <form class="dialog-body" (submit)="$event.preventDefault(); confirmMove()">
+      <h2 id="dept-move-title" class="heading">
+        {{ 'org.departments.moveTitle' | transloco: { name: d.name } }}
+      </h2>
+      <div class="field">
+        <label class="field-label" for="dept-move-target">{{
+          'org.departments.newParent' | transloco
+        }}</label>
+        <select
+          id="dept-move-target"
+          [ngModel]="moveTargetId()"
+          (ngModelChange)="moveTargetId.set($event)"
+          name="target"
+        >
+          <option value="" disabled>{{ 'org.departments.chooseParent' | transloco }}</option>
+          @if (d.parentId !== null) {
+            <option value="root">{{ 'org.departments.rootLevel' | transloco }}</option>
+          }
+          @for (target of moveTargets(); track target.department.id) {
+            <option [value]="target.department.id" [disabled]="target.current">
+              {{ '— '.repeat(target.department.depth - 1) }}{{ target.department.name
+              }}{{ target.current ? ' ' + ('org.departments.currentParent' | transloco) : '' }}
+            </option>
+          }
+        </select>
+        <span class="muted">{{ 'org.departments.hints.move' | transloco }}</span>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" class="btn" (click)="closeMove()">
+          {{ 'admin.cancel' | transloco }}
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="moveTargetId() === '' || busy()">
+          {{ 'org.departments.moveConfirm' | transloco }}
+        </button>
+      </div>
+    </form>
+  }
+</dialog>

@@ -30,7 +30,7 @@ import { Page, RoleSummary, UserWithRoles } from '../rbac.models';
   selector: 'hrm-users-page',
   imports: [ReactiveFormsModule, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['../admin-shared.scss', './users-page.scss'],
+  styleUrls: ['../../../shared/ui/page-shared.scss', './users-page.scss'],
   templateUrl: './users-page.html',
 })
 export class UsersPage {

@@ -244,6 +244,73 @@
   "auditEntities": {
     "roles": "Roles",
     "users": "Accounts",
-    "refresh_tokens": "Sessions"
+    "refresh_tokens": "Sessions",
+    "departments": "Departments"
+  },
+  "org": {
+    "departments": {
+      "title": "Organization",
+      "search": "Find department",
+      "searchPlaceholder": "Name or code",
+      "showInactive": "Show inactive departments",
+      "add": "Add department",
+      "addChild": "Add sub-unit",
+      "edit": "Edit",
+      "moveTo": "Move to…",
+      "deactivate": "Deactivate",
+      "activate": "Reactivate",
+      "delete": "Delete",
+      "dragHint": "Drag a department onto another to change its parent, or use \"Move to…\".",
+      "dropToRoot": "Drop here to make it a top-level department",
+      "rootLevel": "Top level",
+      "empty": "No departments yet.",
+      "inactive": "Inactive",
+      "employees": "{{count}} employees",
+      "expand": "Expand {{name}}",
+      "collapse": "Collapse {{name}}",
+      "createTitle": "Add department",
+      "editTitle": "Edit department",
+      "parentLabel": "Parent",
+      "fields": {
+        "code": "Department code",
+        "name": "Department name"
+      },
+      "hints": {
+        "code": "Uppercase letters, digits, underscore or hyphen, e.g. PRINT-SHOP.",
+        "move": "Only valid targets are listed: not itself, its sub-units or inactive departments."
+      },
+      "validation": {
+        "codeRequired": "Please enter a department code",
+        "codePattern": "2–30 letters, digits, underscores or hyphens",
+        "nameRequired": "Please enter a department name",
+        "nameTooLong": "At most 255 characters"
+      },
+      "moveTitle": "Move \"{{name}}\"",
+      "newParent": "New parent",
+      "chooseParent": "Choose a department",
+      "moveConfirm": "Move",
+      "confirmDeactivate": "Deactivate \"{{name}}\"? It will be hidden from the tree but its history is kept.",
+      "confirmDelete": "Delete \"{{name}}\"? This cannot be undone.",
+      "created": "Added {{name}}.",
+      "updated": "Saved {{name}}.",
+      "moved": "Moved {{name}} under {{target}}.",
+      "deactivated": "Deactivated {{name}}.",
+      "activated": "{{name}} is active again.",
+      "deleted": "Deleted {{name}}.",
+      "currentParent": "(current)"
+    },
+    "errors": {
+      "DEPARTMENT_NOT_FOUND": "Department not found.",
+      "DEPARTMENT_PARENT_NOT_FOUND": "Parent department not found.",
+      "DEPARTMENT_CODE_EXISTS": "This department code already exists.",
+      "DEPARTMENT_CODE_INVALID": "Invalid department code.",
+      "DEPARTMENT_MOVE_CYCLE": "A department cannot be moved into itself or one of its sub-units.",
+      "DEPARTMENT_PARENT_INACTIVE": "The parent department is inactive.",
+      "DEPARTMENT_HAS_CHILDREN": "This department has {{childCount}} sub-units. Move or delete them first.",
+      "DEPARTMENT_HAS_EMPLOYEES": "This department has had {{employeeCount}} employees and cannot be deleted. Deactivate it instead.",
+      "DEPARTMENT_HAS_ACTIVE_CHILDREN": "This department has {{childCount}} active sub-units.",
+      "DEPARTMENT_HAS_ACTIVE_EMPLOYEES": "This department still has {{employeeCount}} working employees. Transfer them first.",
+      "DEPARTMENT_IN_USE": "This department is referenced elsewhere and cannot be deleted. Deactivate it instead."
+    }
   }
 }

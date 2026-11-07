@@ -7,7 +7,8 @@ package vn.sspack.hrm.platform.application.audit;
 public enum AuditEntity {
     USERS("users"),
     ROLES("roles"),
-    REFRESH_TOKENS("refresh_tokens");
+    REFRESH_TOKENS("refresh_tokens"),
+    DEPARTMENTS("departments");
 
     private final String table;
 

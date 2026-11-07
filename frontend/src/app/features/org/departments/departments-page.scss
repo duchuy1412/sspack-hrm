@@ -1,0 +1,159 @@
+.toolbar {
+  align-items: flex-end;
+  justify-content: flex-start;
+}
+
+.search {
+  flex: 1 1 260px;
+  max-width: 420px;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  cursor: pointer;
+}
+
+.toolbar .btn-primary {
+  margin-left: auto;
+}
+
+.tree {
+  padding: var(--space-2) 0;
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  ul ul {
+    margin-left: 28px;
+    border-left: 1px solid var(--line);
+  }
+}
+
+.empty {
+  padding: var(--space-4);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 52px;
+  padding: 6px var(--space-4) 6px var(--space-2);
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+
+  &[draggable='true'] {
+    cursor: grab;
+  }
+
+  &.inactive .dept-name {
+    color: var(--ink-muted);
+  }
+
+  &.is-dragging {
+    opacity: 0.5;
+  }
+
+  &.drop-ok {
+    border-color: var(--brand-strong);
+    background: var(--brand-soft);
+  }
+
+  &.drop-blocked {
+    opacity: 0.45;
+  }
+}
+
+.twisty {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--ink-muted);
+  cursor: pointer;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.dept-name {
+  font: var(--text-label);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-left: auto;
+}
+
+.link-button.danger {
+  color: var(--danger);
+}
+
+.root-zone {
+  padding: var(--space-4);
+  border: 2px dashed var(--line-strong);
+  border-radius: var(--radius-md);
+  color: var(--ink-muted);
+  text-align: center;
+
+  &.drop-ok {
+    border-color: var(--brand-strong);
+    background: var(--brand-soft);
+    color: var(--ink);
+  }
+
+  &.drop-blocked {
+    opacity: 0.45;
+  }
+}
+
+.dialog {
+  width: min(480px, calc(100vw - 2 * var(--space-4)));
+  padding: 0;
+  color: var(--ink);
+
+  &::backdrop {
+    background: color-mix(in srgb, var(--ink) 40%, transparent);
+  }
+}
+
+.dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+@media (max-width: 720px) {
+  .row {
+    flex-wrap: wrap;
+  }
+
+  .actions {
+    margin-left: 36px;
+    gap: var(--space-2) var(--space-4);
+  }
+}
