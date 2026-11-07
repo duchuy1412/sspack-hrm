@@ -37,7 +37,11 @@ export const NAV_ITEMS: readonly NavItem[] = [
     permissions: ['recruitment:requisition', 'recruitment:manage', 'recruitment:evaluate'],
   },
   { path: 'reports', labelKey: 'nav.reports', permissions: ['payroll:manage'] },
-  { path: 'admin', labelKey: 'nav.admin', permissions: ['role:manage', 'user:manage'] },
+  {
+    path: 'admin',
+    labelKey: 'nav.admin',
+    permissions: ['role:manage', 'user:manage', 'audit:read'],
+  },
 ];
 
 /** Quyền của một mục điều hướng; dùng chung cho menu và guard của route để hai nơi không lệch nhau. */

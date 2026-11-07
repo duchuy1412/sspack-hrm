@@ -141,14 +141,14 @@ class RbacIT {
 
         List<String> actions = jdbc.sql("""
                         SELECT action FROM hrm.audit_logs
-                        WHERE entity_type = 'role' AND entity_id = :id AND user_id = :userId ORDER BY id
+                        WHERE entity_type = 'roles' AND entity_id = :id AND user_id = :userId ORDER BY id
                         """)
                 .param("id", id).param("userId", adminId).query(String.class).list();
         assertThat(actions).containsExactly("CREATE", "UPDATE", "DELETE");
 
         String updateAudit = jdbc.sql("""
                         SELECT old_value::text || '|' || new_value::text FROM hrm.audit_logs
-                        WHERE entity_type = 'role' AND entity_id = :id AND action = 'UPDATE'
+                        WHERE entity_type = 'roles' AND entity_id = :id AND action = 'UPDATE'
                         """)
                 .param("id", id).query(String.class).single();
         assertThat(updateAudit).contains("leave:approve", "attendance:confirm", "Trưởng ca sản xuất");
@@ -255,7 +255,7 @@ class RbacIT {
 
         String audit = jdbc.sql("""
                         SELECT new_value::text FROM hrm.audit_logs
-                        WHERE entity_type = 'user' AND entity_id = :id AND action = 'UPDATE'
+                        WHERE entity_type = 'users' AND entity_id = :id AND action = 'UPDATE'
                         """)
                 .param("id", user.id()).query(String.class).single();
         assertThat(audit).contains(code);

@@ -73,6 +73,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/roles", "/api/v1/roles/**", "/api/v1/permissions")
                         .hasAuthority("role:manage")
                         .requestMatchers("/api/v1/users", "/api/v1/users/**").hasAuthority("user:manage")
+                        .requestMatchers("/api/v1/audit-logs", "/api/v1/audit-logs/**").hasAuthority("audit:read")
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(o -> o
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(SecurityConfig::toAuthentication))

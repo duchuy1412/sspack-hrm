@@ -102,7 +102,8 @@
     "cancel": "Hủy",
     "tabs": {
       "roles": "Vai trò",
-      "users": "Gán vai trò"
+      "users": "Gán vai trò",
+      "audit": "Nhật ký"
     },
     "pager": {
       "label": "Phân trang",
@@ -194,7 +195,55 @@
       "ROLE_IN_USE": "Vai trò đang được gán cho {{assignedUserCount}} người dùng. Hãy gỡ vai trò khỏi họ trước khi xóa.",
       "USER_NO_ROLE": "Người dùng phải có ít nhất một vai trò.",
       "USER_SELF_LOCKOUT": "Bạn không thể tự gỡ vai trò đang cho phép mình quản lý tài khoản.",
-      "VALIDATION_FAILED": "Vui lòng kiểm tra lại các trường được đánh dấu."
+      "VALIDATION_FAILED": "Vui lòng kiểm tra lại các trường được đánh dấu.",
+      "AUDIT_RANGE_INVALID": "Ngày bắt đầu phải trước hoặc bằng ngày kết thúc.",
+      "AUDIT_ENTITY_UNKNOWN": "Bảng này không có trong nhật ký."
+    },
+    "audit": {
+      "intro": "Mọi thao tác thêm, sửa, xóa và đăng nhập được ghi lại: ai, lúc nào, bảng nào, giá trị trước và sau. Nhật ký không sửa, không xóa được.",
+      "filters": {
+        "from": "Từ ngày",
+        "to": "Đến ngày",
+        "user": "Người thực hiện",
+        "entity": "Bảng",
+        "action": "Hành động",
+        "all": "Tất cả",
+        "apply": "Lọc",
+        "reset": "Xóa bộ lọc"
+      },
+      "columns": {
+        "time": "Thời điểm",
+        "user": "Người thực hiện",
+        "action": "Hành động",
+        "entity": "Đối tượng",
+        "ip": "Địa chỉ IP",
+        "details": "Chi tiết"
+      },
+      "system": "Hệ thống",
+      "viewDetails": "Xem chi tiết",
+      "empty": "Không có dòng nhật ký nào khớp bộ lọc.",
+      "total": "{{count}} dòng",
+      "close": "Đóng",
+      "diff": {
+        "field": "Trường",
+        "before": "Trước",
+        "after": "Sau",
+        "changed": "đã đổi",
+        "empty": "Thao tác này không lưu giá trị."
+      }
     }
+  },
+  "auditActions": {
+    "CREATE": "Thêm",
+    "UPDATE": "Sửa",
+    "DELETE": "Xóa",
+    "LOGIN": "Đăng nhập",
+    "LOGOUT": "Đăng xuất",
+    "EXPORT": "Xuất dữ liệu"
+  },
+  "auditEntities": {
+    "roles": "Vai trò",
+    "users": "Tài khoản",
+    "refresh_tokens": "Phiên đăng nhập"
   }
 }

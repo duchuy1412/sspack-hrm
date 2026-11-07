@@ -121,6 +121,8 @@ Profile `dev` nạp thêm tài khoản dùng thử (`db/dev/R__demo_users.sql`),
 
 Phân quyền (PLT-03): Admin vào **Quản trị → Vai trò** để tạo vai trò, chọn quyền theo chức năng (`module:action`) và phạm vi dữ liệu; tab **Gán vai trò** gán vai trò cho tài khoản. Quyền được kiểm tra ở API (`@PreAuthorize` và chặn theo URL) lẫn giao diện (ẩn menu, chặn route, ẩn nút). Quyền nằm trong access token nên thay đổi có hiệu lực với người đang đăng nhập ở lần làm mới token kế tiếp, **tối đa 15 phút**; khi đó giao diện tự nạp lại quyền. Vai trò hệ thống không xóa được, không đổi phạm vi dữ liệu; vai trò Admin luôn giữ `role:manage`; Admin không tự gỡ quyền quản lý tài khoản của mình.
 
+Nhật ký thao tác (PLT-04): **Quản trị → Nhật ký** (quyền `audit:read`) lọc theo khoảng ngày, người thực hiện, bảng, hành động; mỗi dòng mở ra so sánh giá trị trước/sau. Bảng `audit_logs` chỉ thêm dòng (trigger chặn UPDATE, DELETE, TRUNCATE). Test kiến trúc `AuditCoverageTest` bắt buộc mọi method `@Transactional` ghi dữ liệu trong tầng `application` gọi `AuditLogService.record` hoặc ghi rõ lý do bằng `@NoAudit("…")`; `AuditLogService` từ chối snapshot chứa mật khẩu hay token.
+
 ### 3. Frontend
 
 ```bash
