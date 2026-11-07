@@ -14,7 +14,8 @@
     "attendance": "Attendance",
     "payroll": "Payroll",
     "recruitment": "Recruitment",
-    "reports": "Reports"
+    "reports": "Reports",
+    "admin": "Administration"
   },
   "language": {
     "label": "Language",
@@ -70,5 +71,130 @@
     "MANAGER": "Line manager",
     "EMPLOYEE": "Employee",
     "INTERVIEWER": "Interviewer"
+  },
+  "forbidden": {
+    "title": "Access denied",
+    "message": "Your account is not allowed to open this page. Contact your system administrator if you need access.",
+    "back": "Back to home"
+  },
+  "dataScope": {
+    "ALL": "Whole company",
+    "DEPARTMENT_TREE": "Own department and below",
+    "DEPARTMENT": "Own department only",
+    "SELF": "Self only",
+    "ASSIGNED": "Assigned items"
+  },
+  "permissionModules": {
+    "platform": "Platform",
+    "org": "Organization",
+    "employee": "Employee records",
+    "leave": "Leave",
+    "attendance": "Attendance",
+    "payroll": "Payroll",
+    "recruitment": "Recruitment",
+    "dashboard": "Dashboard"
+  },
+  "admin": {
+    "title": "Administration",
+    "loading": "Loading…",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "tabs": {
+      "roles": "Roles",
+      "users": "Role assignment"
+    },
+    "pager": {
+      "label": "Pagination",
+      "previous": "Previous",
+      "next": "Next",
+      "status": "Page {{page}} of {{total}}"
+    },
+    "roles": {
+      "intro": "Each role combines functional permissions with a data scope. Changes take effect when users refresh their session (up to 15 minutes).",
+      "add": "Add role",
+      "empty": "No roles yet.",
+      "system": "System",
+      "custom": "Custom",
+      "columns": {
+        "name": "Role",
+        "dataScope": "Data scope",
+        "permissions": "Permissions",
+        "users": "Users",
+        "type": "Type",
+        "updatedAt": "Updated"
+      },
+      "createTitle": "Add role",
+      "editTitle": "Edit role",
+      "backToList": "Back to list",
+      "generalSection": "General",
+      "permissionsSection": "Functional permissions",
+      "selectedCount": "{{count}} permissions selected",
+      "fields": {
+        "code": "Role code",
+        "name": "Role name",
+        "dataScope": "Data scope",
+        "description": "Description"
+      },
+      "hints": {
+        "code": "Uppercase letters, digits or underscores, e.g. SHIFT_LEAD. Cannot be changed later.",
+        "dataScope": "Limits which data holders of this role can see and act on.",
+        "systemScope": "System roles keep a fixed data scope.",
+        "adminLocked": "The System administrator role always keeps role management so nobody is locked out of this screen.",
+        "inUse": "Assigned to {{count}} users; remove it from them before deleting."
+      },
+      "validation": {
+        "codeRequired": "Please enter a role code",
+        "codePattern": "2–50 letters, digits or underscores, starting with a letter",
+        "nameRequired": "Please enter a role name",
+        "dataScopeRequired": "Please choose a data scope",
+        "descriptionRequired": "Please enter a description",
+        "tooLong": "At most {{max}} characters",
+        "permissionsRequired": "Please select at least one permission."
+      },
+      "delete": "Delete role",
+      "confirmDelete": "Delete role \"{{name}}\"? This cannot be undone."
+    },
+    "users": {
+      "search": "Find account",
+      "searchPlaceholder": "Enter email",
+      "effectNote": "New roles take effect when the user refreshes their session (up to 15 minutes).",
+      "columns": {
+        "email": "Email",
+        "status": "Status",
+        "roles": "Roles",
+        "actions": "Actions"
+      },
+      "status": {
+        "ACTIVE": "Active",
+        "LOCKED": "Locked",
+        "DISABLED": "Disabled"
+      },
+      "assign": "Assign roles",
+      "empty": "No accounts found.",
+      "dialogTitle": "Assign roles",
+      "saved": "Roles updated for {{email}}.",
+      "validation": {
+        "roleRequired": "A user must have at least one role."
+      }
+    },
+    "errors": {
+      "generic": "The action could not be completed. Please try again.",
+      "network": "Cannot reach the server. Check your connection and try again.",
+      "FORBIDDEN": "You are not allowed to do this.",
+      "CONCURRENT_MODIFICATION": "Someone else just changed this data. Reload the page and try again.",
+      "ROLE_NOT_FOUND": "Role not found.",
+      "USER_NOT_FOUND": "User not found.",
+      "ROLE_CODE_EXISTS": "This role code already exists.",
+      "ROLE_CODE_INVALID": "Invalid role code.",
+      "ROLE_NO_PERMISSION": "A role needs at least one permission.",
+      "ROLE_ADMIN_MUST_MANAGE_ROLES": "The System administrator role must keep role management.",
+      "ROLE_SYSTEM_SCOPE_LOCKED": "The data scope of a system role cannot be changed.",
+      "ROLE_SYSTEM_NOT_DELETABLE": "System roles cannot be deleted.",
+      "ROLE_IN_USE": "This role is assigned to {{assignedUserCount}} users. Remove it from them before deleting.",
+      "USER_NO_ROLE": "A user must have at least one role.",
+      "USER_SELF_LOCKOUT": "You cannot remove the role that lets you manage accounts from yourself.",
+      "VALIDATION_FAILED": "Please check the highlighted fields."
+    }
   }
 }

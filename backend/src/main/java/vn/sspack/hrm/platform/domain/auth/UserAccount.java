@@ -2,6 +2,7 @@ package vn.sspack.hrm.platform.domain.auth;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
@@ -21,6 +22,8 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 
+import org.hibernate.annotations.BatchSize;
+
 /**
  * Tài khoản đăng nhập (bảng {@code users}). Chứa quy tắc khóa tạm thời khi đăng nhập sai (PLT-01).
  * Họ tên nằm ở hồ sơ nhân viên (module employee), không ở đây.
@@ -28,6 +31,8 @@ import jakarta.persistence.Version;
 @Entity
 @Table(name = "users")
 public class UserAccount {
+
+    public static final String USER_MANAGE_PERMISSION = "user:manage";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -67,6 +72,7 @@ public class UserAccount {
     @Version
     private int version;
 
+    @BatchSize(size = 50)
     @ManyToMany
     @JoinTable(name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -145,6 +151,23 @@ public class UserAccount {
         return codes;
     }
 
+    /**
+     * Thay toàn bộ vai trò của tài khoản (PLT-03). Phải còn ít nhất một vai trò; người tự sửa chính mình
+     * không được gỡ quyền quản lý tài khoản của bản thân (tránh khóa mình ra ngoài).
+     */
+    public void assignRoles(Collection<Role> newRoles, boolean actingOnSelf, OffsetDateTime now) {
+        if (newRoles == null || newRoles.isEmpty()) {
+            throw RoleRuleException.userMustHaveRole();
+        }
+        if (actingOnSelf && permissionCodes().contains(USER_MANAGE_PERMISSION)
+                && newRoles.stream().noneMatch(r -> r.grants(USER_MANAGE_PERMISSION))) {
+            throw RoleRuleException.cannotRemoveOwnUserManage();
+        }
+        roles.clear();
+        roles.addAll(newRoles);
+        updatedAt = now;
+    }
+
     // ---------------------------------------------------------------- getter
 
     public Long getId() {
@@ -181,6 +204,10 @@ public class UserAccount {
 
     public String getPreferredLocale() {
         return preferredLocale;
+    }
+
+    public int getVersion() {
+        return version;
     }
 
     public Set<Role> getRoles() {

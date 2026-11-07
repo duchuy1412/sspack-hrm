@@ -1,0 +1,128 @@
+<div class="toolbar">
+  <div class="field search">
+    <label class="field-label" for="user-search">{{ 'admin.users.search' | transloco }}</label>
+    <input
+      id="user-search"
+      type="search"
+      [formControl]="search"
+      [placeholder]="'admin.users.searchPlaceholder' | transloco"
+    />
+  </div>
+  <p class="muted">{{ 'admin.users.effectNote' | transloco }}</p>
+</div>
+
+@if (error(); as message) {
+  <p class="alert" role="alert">{{ message }}</p>
+}
+@if (savedMessage(); as email) {
+  <p class="notice" role="status">{{ 'admin.users.saved' | transloco: { email } }}</p>
+}
+
+<section class="card table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">{{ 'admin.users.columns.email' | transloco }}</th>
+        <th scope="col">{{ 'admin.users.columns.status' | transloco }}</th>
+        <th scope="col">{{ 'admin.users.columns.roles' | transloco }}</th>
+        <th scope="col">
+          <span class="visually-hidden">{{ 'admin.users.columns.actions' | transloco }}</span>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (user of page()?.content ?? []; track user.id) {
+        <tr>
+          <td>{{ user.email }}</td>
+          <td>
+            <span class="chip" [class.chip-brand]="user.status === 'ACTIVE'">
+              {{ 'admin.users.status.' + user.status | transloco }}
+            </span>
+          </td>
+          <td>
+            <div class="chips">
+              @for (role of user.roles; track role.id) {
+                <span class="chip">{{ role.name }}</span>
+              }
+            </div>
+          </td>
+          <td class="row-action">
+            <button type="button" class="link-button" (click)="open(user)">
+              {{ 'admin.users.assign' | transloco }}
+              <span class="visually-hidden">{{ user.email }}</span>
+            </button>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="4" class="muted">
+            {{ (loading() ? 'admin.loading' : 'admin.users.empty') | transloco }}
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</section>
+
+@if (page(); as p) {
+  @if (p.totalPages > 1) {
+    <nav class="pager" [attr.aria-label]="'admin.pager.label' | transloco">
+      <button type="button" class="btn" [disabled]="p.page === 0" (click)="goTo(p.page - 1)">
+        {{ 'admin.pager.previous' | transloco }}
+      </button>
+      <span class="muted">{{
+        'admin.pager.status' | transloco: { page: p.page + 1, total: p.totalPages }
+      }}</span>
+      <button
+        type="button"
+        class="btn"
+        [disabled]="p.page + 1 >= p.totalPages"
+        (click)="goTo(p.page + 1)"
+      >
+        {{ 'admin.pager.next' | transloco }}
+      </button>
+    </nav>
+  }
+}
+
+<dialog #dialog class="dialog card" aria-labelledby="assign-title" (cancel)="close()">
+  @if (editing(); as user) {
+    <form class="dialog-body" (submit)="$event.preventDefault(); save()">
+      <h2 id="assign-title" class="heading">{{ 'admin.users.dialogTitle' | transloco }}</h2>
+      <p class="muted">{{ user.email }}</p>
+
+      <fieldset class="role-list">
+        <legend class="visually-hidden">{{ 'admin.users.columns.roles' | transloco }}</legend>
+        @for (role of dialogRoles(); track role.id) {
+          <label class="check">
+            <input
+              type="checkbox"
+              [checked]="chosen().has(role.id)"
+              (change)="toggle(role.id, $any($event.target).checked)"
+            />
+            <span>
+              {{ role.name }}
+              <span class="muted">{{ role.code }}</span>
+            </span>
+          </label>
+        }
+      </fieldset>
+
+      @if (chosen().size === 0) {
+        <p class="field-error">{{ 'admin.users.validation.roleRequired' | transloco }}</p>
+      }
+      @if (dialogError(); as message) {
+        <p class="alert" role="alert">{{ message }}</p>
+      }
+
+      <div class="dialog-actions">
+        <button type="button" class="btn" (click)="close()">
+          {{ 'admin.cancel' | transloco }}
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="saving() || chosen().size === 0">
+          {{ (saving() ? 'admin.saving' : 'admin.save') | transloco }}
+        </button>
+      </div>
+    </form>
+  }
+</dialog>

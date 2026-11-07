@@ -46,6 +46,12 @@ export class AuthService {
     return this.permissions().has(code);
   }
 
+  /** Có ít nhất một quyền trong danh sách (PLT-03: ẩn menu, chặn route, ẩn nút). */
+  hasAnyPermission(codes: readonly string[]): boolean {
+    const granted = this.permissions();
+    return codes.some((code) => granted.has(code));
+  }
+
   login(email: string, password: string, rememberMe: boolean): Observable<CurrentUser> {
     return this.http
       .post<AccessTokenResponse>(`${AUTH_API}/login`, { email, password, rememberMe })
@@ -70,7 +76,13 @@ export class AuthService {
               ? timer(300)
               : throwError(() => err),
         }),
-        tap((res) => this.token.set(res.accessToken)),
+        tap((res) => {
+          this.token.set(res.accessToken);
+          // Admin có thể vừa đổi vai trò/quyền (PLT-03): token mới mang quyền mới, nạp lại /me để menu khớp
+          if (this.currentUser() !== null) {
+            this.loadCurrentUser().subscribe({ error: () => undefined });
+          }
+        }),
         map((res) => res.accessToken),
         catchError((err: unknown) => {
           this.clearSession();
