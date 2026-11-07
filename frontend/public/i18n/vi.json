@@ -244,6 +244,73 @@
   "auditEntities": {
     "roles": "Vai trò",
     "users": "Tài khoản",
-    "refresh_tokens": "Phiên đăng nhập"
+    "refresh_tokens": "Phiên đăng nhập",
+    "departments": "Phòng ban"
+  },
+  "org": {
+    "departments": {
+      "title": "Cơ cấu tổ chức",
+      "search": "Tìm phòng ban",
+      "searchPlaceholder": "Nhập tên hoặc mã",
+      "showInactive": "Hiện phòng ban ngừng hoạt động",
+      "add": "Thêm phòng ban",
+      "addChild": "Thêm cấp dưới",
+      "edit": "Sửa",
+      "moveTo": "Chuyển đến…",
+      "deactivate": "Ngừng hoạt động",
+      "activate": "Hoạt động lại",
+      "delete": "Xóa",
+      "dragHint": "Kéo một phòng ban thả lên phòng ban khác để đổi cấp trên, hoặc dùng \"Chuyển đến…\".",
+      "dropToRoot": "Thả vào đây để đưa lên cấp cao nhất",
+      "rootLevel": "Cấp cao nhất",
+      "empty": "Chưa có phòng ban nào.",
+      "inactive": "Ngừng hoạt động",
+      "employees": "{{count}} nhân viên",
+      "expand": "Mở {{name}}",
+      "collapse": "Thu gọn {{name}}",
+      "createTitle": "Thêm phòng ban",
+      "editTitle": "Sửa phòng ban",
+      "parentLabel": "Cấp trên",
+      "fields": {
+        "code": "Mã phòng ban",
+        "name": "Tên phòng ban"
+      },
+      "hints": {
+        "code": "Chữ in hoa, số, gạch dưới hoặc gạch ngang, vd XUONG-IN.",
+        "move": "Chỉ liệt kê nơi được phép: không phải chính nó, cấp dưới của nó hay phòng ban ngừng hoạt động."
+      },
+      "validation": {
+        "codeRequired": "Vui lòng nhập mã phòng ban",
+        "codePattern": "Mã gồm 2–30 ký tự: chữ, số, dấu gạch dưới hoặc gạch ngang",
+        "nameRequired": "Vui lòng nhập tên phòng ban",
+        "nameTooLong": "Tên phòng ban tối đa 255 ký tự"
+      },
+      "moveTitle": "Chuyển \"{{name}}\"",
+      "newParent": "Cấp trên mới",
+      "chooseParent": "Chọn phòng ban",
+      "moveConfirm": "Chuyển",
+      "confirmDeactivate": "Ngừng hoạt động \"{{name}}\"? Phòng ban sẽ bị ẩn khỏi cây nhưng vẫn giữ lịch sử.",
+      "confirmDelete": "Xóa \"{{name}}\"? Thao tác này không hoàn tác được.",
+      "created": "Đã thêm {{name}}.",
+      "updated": "Đã lưu {{name}}.",
+      "moved": "Đã chuyển {{name}} vào {{target}}.",
+      "deactivated": "Đã ngừng hoạt động {{name}}.",
+      "activated": "{{name}} đã hoạt động lại.",
+      "deleted": "Đã xóa {{name}}.",
+      "currentParent": "(hiện tại)"
+    },
+    "errors": {
+      "DEPARTMENT_NOT_FOUND": "Không tìm thấy phòng ban.",
+      "DEPARTMENT_PARENT_NOT_FOUND": "Không tìm thấy phòng ban cấp trên.",
+      "DEPARTMENT_CODE_EXISTS": "Mã phòng ban đã tồn tại.",
+      "DEPARTMENT_CODE_INVALID": "Mã phòng ban không hợp lệ.",
+      "DEPARTMENT_MOVE_CYCLE": "Không thể chuyển phòng ban vào chính nó hoặc vào phòng ban cấp dưới của nó.",
+      "DEPARTMENT_PARENT_INACTIVE": "Phòng ban cấp trên đã ngừng hoạt động.",
+      "DEPARTMENT_HAS_CHILDREN": "Phòng ban còn {{childCount}} phòng ban cấp dưới. Hãy chuyển hoặc xóa chúng trước.",
+      "DEPARTMENT_HAS_EMPLOYEES": "Phòng ban đã có {{employeeCount}} nhân viên nên không xóa được. Hãy chọn Ngừng hoạt động.",
+      "DEPARTMENT_HAS_ACTIVE_CHILDREN": "Phòng ban còn {{childCount}} phòng ban cấp dưới đang hoạt động.",
+      "DEPARTMENT_HAS_ACTIVE_EMPLOYEES": "Phòng ban còn {{employeeCount}} nhân viên đang làm việc. Hãy điều chuyển họ trước.",
+      "DEPARTMENT_IN_USE": "Phòng ban đang được dùng ở dữ liệu khác nên không xóa được. Hãy chọn Ngừng hoạt động."
+    }
   }
 }

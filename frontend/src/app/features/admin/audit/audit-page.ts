@@ -34,7 +34,7 @@ import {
   selector: 'hrm-audit-page',
   imports: [ReactiveFormsModule, TranslocoPipe, DatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['../admin-shared.scss', './audit-page.scss'],
+  styleUrls: ['../../../shared/ui/page-shared.scss', './audit-page.scss'],
   templateUrl: './audit-page.html',
 })
 export class AuditPage {

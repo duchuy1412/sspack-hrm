@@ -27,7 +27,7 @@ const ADMIN_LOCKED_PERMISSION = 'role:manage';
   selector: 'hrm-role-editor',
   imports: [ReactiveFormsModule, RouterLink, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['../admin-shared.scss', './role-editor.scss'],
+  styleUrls: ['../../../shared/ui/page-shared.scss', './role-editor.scss'],
   templateUrl: './role-editor.html',
 })
 export class RoleEditorPage implements OnInit {
