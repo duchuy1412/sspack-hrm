@@ -1,6 +1,7 @@
 package vn.sspack.hrm.org.infrastructure.persistence;
 
 import java.time.OffsetDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +29,12 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select d from Department d where d.id = :id and d.companyId = :companyId")
     Optional<Department> findForUpdate(@Param("id") Long id, @Param("companyId") Long companyId);
+
+    /** Id của phòng ban có path bắt đầu bằng {@code prefix}: chính nó và mọi cấp dưới. */
+    @Query("select d.id from Department d where d.companyId = :companyId and d.path like concat(:prefix, '%')")
+    List<Long> findIdsByPathPrefix(@Param("companyId") Long companyId, @Param("prefix") String prefix);
+
+    List<Department> findByCompanyIdAndIdIn(Long companyId, Collection<Long> ids);
 
     boolean existsByCompanyIdAndCode(Long companyId, String code);
 

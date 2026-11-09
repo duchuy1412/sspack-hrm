@@ -1,0 +1,120 @@
+// Kiểu riêng của phân hệ Nhân viên (EMP-01). Thành phần chung ở page-shared.scss.
+
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.titles {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+
+  h1,
+  p {
+    margin: 0;
+  }
+
+  h1 {
+    overflow-wrap: anywhere;
+  }
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-4);
+
+  .field {
+    flex: 1 1 180px;
+  }
+
+  .search {
+    flex: 2 1 260px;
+  }
+}
+
+table {
+  min-width: 860px;
+}
+
+td.code,
+td.date {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+td.code {
+  color: var(--ink-muted);
+}
+
+td.person {
+  min-width: 220px;
+}
+
+// Flex nằm trong div, không đặt lên td: td dạng flex mất hành vi ô bảng (lệch viền, chiều cao dòng)
+.person-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.avatar {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-100);
+  font: var(--text-label);
+}
+
+.person-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.person-name {
+  color: var(--ink);
+  font: var(--text-label);
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--brand-strong);
+    text-decoration: underline;
+  }
+}
+
+.chip.status[data-status='ACTIVE'] {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.chip.status[data-status='PROBATION'] {
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  color: var(--warning);
+}
+
+.pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+  padding: 12px var(--space-4);
+  border-top: 1px solid var(--line);
+}
+
+.pager-buttons {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}

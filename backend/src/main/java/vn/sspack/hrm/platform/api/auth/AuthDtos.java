@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-import vn.sspack.hrm.platform.domain.auth.DataScope;
+import vn.sspack.hrm.shared.security.DataScope;
 
 /** DTO của API xác thực. */
 public final class AuthDtos {
