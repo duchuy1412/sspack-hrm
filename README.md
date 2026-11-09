@@ -125,6 +125,8 @@ Nhật ký thao tác (PLT-04): **Quản trị → Nhật ký** (quyền `audit:r
 
 Cây phòng ban (ORG-01): mục **Cơ cấu tổ chức** hiện cây nhiều cấp cho mọi người dùng (`org:read`); HR (`org:manage`) thêm, sửa, kéo một phòng ban thả lên phòng ban khác để đổi cấp trên (hoặc dùng **Chuyển đến…** bằng bàn phím, trên điện thoại). Cây lưu bằng materialized path (`/1/4/12/`); chuyển một nhánh cập nhật path cả nhánh trong một transaction và không cho chuyển vào chính nó hay cấp dưới của nó. **Xóa** chỉ dành cho phòng ban chưa có cấp dưới và chưa từng có nhân viên; phòng ban giải thể dùng **Ngừng hoạt động** (khi không còn nhân viên đang làm và cấp dưới đang hoạt động) để giữ lịch sử. Profile `dev` nạp cây phòng ban mẫu (`db/dev/R__demo_departments.sql`).
 
+Chức danh và cấp bậc (ORG-02): **Cơ cấu tổ chức → Cấp bậc** (chỉ `org:manage`) khai báo cấp bậc kèm khung lương tối thiểu–tối đa, tính bằng đồng, hiển thị dạng `12.000.000 ₫`. Tab **Chức danh** liệt kê chức danh cho mọi người dùng; mỗi chức danh bắt buộc gắn với một cấp bậc đang hoạt động (cột `job_grade_id` NOT NULL từ migration V6). Khung lương là dữ liệu nhạy cảm: API `/api/v1/job-grades` cần `org:manage` cả khi đọc, còn `/api/v1/positions` chỉ trả mã và tên cấp bậc. Cấp bậc không ngừng hoạt động được khi còn chức danh đang hoạt động, không xóa được khi còn bất kỳ chức danh nào; chức danh đã có nhân viên không xóa được, chỉ ngừng hoạt động. Profile `dev` nạp 7 cấp bậc và 15 chức danh mẫu (`db/dev/R__demo_job_grades_positions.sql`).
+
 ### 3. Frontend
 
 ```bash

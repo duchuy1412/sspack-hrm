@@ -245,9 +245,27 @@
     "roles": "Roles",
     "users": "Accounts",
     "refresh_tokens": "Sessions",
-    "departments": "Departments"
+    "departments": "Departments",
+    "job_grades": "Job grades",
+    "positions": "Positions"
   },
   "org": {
+    "title": "Organization",
+    "tabs": {
+      "departments": "Departments",
+      "positions": "Positions",
+      "jobGrades": "Job grades"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "actions": {
+      "edit": "Edit",
+      "deactivate": "Deactivate",
+      "activate": "Reactivate",
+      "delete": "Delete"
+    },
     "departments": {
       "title": "Organization",
       "search": "Find department",
@@ -299,6 +317,97 @@
       "deleted": "Deleted {{name}}.",
       "currentParent": "(current)"
     },
+    "positions": {
+      "search": "Search positions",
+      "searchPlaceholder": "Name or code",
+      "gradeFilter": "Job grade",
+      "allGrades": "All grades",
+      "showInactive": "Show inactive positions",
+      "add": "Add position",
+      "empty": "No positions yet.",
+      "noMatch": "No positions match the filters.",
+      "gradeInactive": "Grade inactive",
+      "columns": {
+        "code": "Code",
+        "name": "Position name",
+        "grade": "Job grade",
+        "range": "Salary range",
+        "employees": "Employees",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "createTitle": "Add position",
+      "editTitle": "Edit position",
+      "fields": {
+        "code": "Position code",
+        "name": "Position name",
+        "grade": "Job grade"
+      },
+      "hints": {
+        "code": "Upper-case letters, digits, underscore or hyphen, e.g. KS-QC."
+      },
+      "chooseGrade": "Choose a grade",
+      "gradeRange": "Salary range: {{range}}",
+      "noGrades": "There are no active job grades. Add a grade first.",
+      "validation": {
+        "codeRequired": "Please enter a position code",
+        "codePattern": "Code must be 2–30 letters, digits, underscores or hyphens",
+        "nameRequired": "Please enter a position name",
+        "nameTooLong": "Position name must be at most 150 characters",
+        "jobGradeIdRequired": "Please choose a job grade"
+      },
+      "confirmDeactivate": "Deactivate position \"{{name}}\"? Employees holding it are not affected.",
+      "confirmDelete": "Delete position \"{{name}}\"? This cannot be undone.",
+      "created": "Added position {{name}}.",
+      "updated": "Saved position {{name}}.",
+      "deactivated": "Deactivated position {{name}}.",
+      "activated": "Position {{name}} is active again.",
+      "deleted": "Deleted position {{name}}."
+    },
+    "jobGrades": {
+      "intro": "Each job grade has a salary range. A position uses the salary range of its grade.",
+      "showInactive": "Show inactive grades",
+      "add": "Add grade",
+      "empty": "No job grades yet.",
+      "columns": {
+        "code": "Code",
+        "name": "Grade name",
+        "range": "Salary range",
+        "positions": "Positions",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "createTitle": "Add job grade",
+      "editTitle": "Edit job grade",
+      "fields": {
+        "code": "Grade code",
+        "name": "Grade name",
+        "minSalary": "Minimum salary (₫)",
+        "maxSalary": "Maximum salary (₫)"
+      },
+      "hints": {
+        "code": "Upper-case letters, digits, underscore or hyphen, e.g. G3.",
+        "money": "Enter whole dong, e.g. 12.000.000. For a single-point range enter the same amount twice."
+      },
+      "preview": "Salary range: {{range}}",
+      "validation": {
+        "codeRequired": "Please enter a grade code",
+        "codePattern": "Code must be 2–20 letters, digits, underscores or hyphens",
+        "nameRequired": "Please enter a grade name",
+        "nameTooLong": "Grade name must be at most 100 characters",
+        "minSalaryRequired": "Please enter the minimum salary",
+        "maxSalaryRequired": "Please enter the maximum salary",
+        "money": "Enter a whole amount greater than 0, at most 15 digits",
+        "range": "Maximum salary must be greater than or equal to the minimum"
+      },
+      "confirmDeactivate": "Deactivate grade \"{{name}}\"? New positions can no longer use it.",
+      "confirmDelete": "Delete grade \"{{name}}\"? This cannot be undone.",
+      "created": "Added grade {{name}}.",
+      "updated": "Saved grade {{name}}.",
+      "deactivated": "Deactivated grade {{name}}.",
+      "activated": "Grade {{name}} is active again.",
+      "deleted": "Deleted grade {{name}}."
+    },
     "errors": {
       "DEPARTMENT_NOT_FOUND": "Department not found.",
       "DEPARTMENT_PARENT_NOT_FOUND": "Parent department not found.",
@@ -310,7 +419,23 @@
       "DEPARTMENT_HAS_EMPLOYEES": "This department has had {{employeeCount}} employees and cannot be deleted. Deactivate it instead.",
       "DEPARTMENT_HAS_ACTIVE_CHILDREN": "This department has {{childCount}} active sub-units.",
       "DEPARTMENT_HAS_ACTIVE_EMPLOYEES": "This department still has {{employeeCount}} working employees. Transfer them first.",
-      "DEPARTMENT_IN_USE": "This department is referenced elsewhere and cannot be deleted. Deactivate it instead."
+      "DEPARTMENT_IN_USE": "This department is referenced elsewhere and cannot be deleted. Deactivate it instead.",
+      "JOB_GRADE_NOT_FOUND": "Job grade not found.",
+      "JOB_GRADE_CODE_EXISTS": "This grade code already exists.",
+      "JOB_GRADE_CODE_INVALID": "Invalid grade code.",
+      "JOB_GRADE_SALARY_INVALID": "Salary must be a whole amount greater than 0, at most 15 digits.",
+      "JOB_GRADE_RANGE_INVALID": "Minimum salary cannot exceed the maximum.",
+      "JOB_GRADE_HAS_POSITIONS": "This grade has {{positionCount}} positions and cannot be deleted. Deactivate it instead.",
+      "JOB_GRADE_HAS_ACTIVE_POSITIONS": "This grade still has {{positionCount}} active positions. Move or deactivate them first.",
+      "JOB_GRADE_IN_USE": "This grade is used elsewhere and cannot be deleted. Deactivate it instead.",
+      "POSITION_NOT_FOUND": "Position not found.",
+      "POSITION_CODE_EXISTS": "This position code already exists.",
+      "POSITION_CODE_INVALID": "Invalid position code.",
+      "POSITION_GRADE_REQUIRED": "A position must belong to one of the company's job grades.",
+      "POSITION_GRADE_NOT_FOUND": "Job grade not found.",
+      "POSITION_GRADE_INACTIVE": "The job grade is inactive. Choose another grade or reactivate it.",
+      "POSITION_HAS_EMPLOYEES": "This position has {{employeeCount}} employees and cannot be deleted. Deactivate it instead.",
+      "POSITION_IN_USE": "This position is used elsewhere and cannot be deleted. Deactivate it instead."
     }
   }
 }

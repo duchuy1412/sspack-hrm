@@ -8,7 +8,9 @@ public enum AuditEntity {
     USERS("users"),
     ROLES("roles"),
     REFRESH_TOKENS("refresh_tokens"),
-    DEPARTMENTS("departments");
+    DEPARTMENTS("departments"),
+    JOB_GRADES("job_grades"),
+    POSITIONS("positions");
 
     private final String table;
 

@@ -1,9 +1,31 @@
 import { Routes } from '@angular/router';
 
-/** Phân hệ Cơ cấu tổ chức, lazy-load từ app.routes.ts. ORG-01: cây phòng ban. */
+import { requireAnyPermission } from '../../core/auth/permission.guard';
+
+/**
+ * Phân hệ Cơ cấu tổ chức, lazy-load từ app.routes.ts. ORG-01: cây phòng ban; ORG-02: chức danh và cấp bậc
+ * (khung lương chỉ dành cho người có `org:manage`).
+ */
 export default [
   {
     path: '',
-    loadComponent: () => import('./departments/departments-page').then((m) => m.DepartmentsPage),
+    loadComponent: () => import('./org-layout').then((m) => m.OrgLayout),
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'departments' },
+      {
+        path: 'departments',
+        loadComponent: () =>
+          import('./departments/departments-page').then((m) => m.DepartmentsPage),
+      },
+      {
+        path: 'positions',
+        loadComponent: () => import('./positions/positions-page').then((m) => m.PositionsPage),
+      },
+      {
+        path: 'job-grades',
+        canActivate: [requireAnyPermission('org:manage')],
+        loadComponent: () => import('./job-grades/job-grades-page').then((m) => m.JobGradesPage),
+      },
+    ],
   },
 ] satisfies Routes;

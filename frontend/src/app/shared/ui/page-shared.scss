@@ -21,6 +21,9 @@
 }
 
 .table-wrap {
+  // position: chữ ẩn cho trình đọc màn hình (.visually-hidden, position: absolute) nằm trong ô bị cuộn khuất
+  // phải lấy khung này làm gốc, nếu không nó thoát ra ngoài và làm cả trang cuộn ngang.
+  position: relative;
   overflow-x: auto;
 }
 
