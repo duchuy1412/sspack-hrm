@@ -254,6 +254,7 @@
     "title": "Cơ cấu tổ chức",
     "tabs": {
       "departments": "Phòng ban",
+      "chart": "Sơ đồ",
       "positions": "Chức danh",
       "jobGrades": "Cấp bậc"
     },
@@ -437,6 +438,23 @@
       "POSITION_GRADE_INACTIVE": "Cấp bậc đã ngừng hoạt động. Hãy chọn cấp bậc khác hoặc cho cấp bậc hoạt động lại.",
       "POSITION_HAS_EMPLOYEES": "Chức danh đã có {{employeeCount}} nhân viên nên không xóa được. Hãy chọn Ngừng hoạt động.",
       "POSITION_IN_USE": "Chức danh đang được dùng ở dữ liệu khác nên không xóa được. Hãy chọn Ngừng hoạt động."
+    },
+    "chart": {
+      "search": "Tìm nhân viên trên sơ đồ",
+      "searchPlaceholder": "Nhập tên hoặc mã nhân viên",
+      "total": "{{count}} nhân viên đang làm việc",
+      "matchOf": "Kết quả {{current}}/{{count}}",
+      "noMatch": "Không có nhân viên nào khớp.",
+      "previousMatch": "Kết quả trước",
+      "nextMatch": "Kết quả sau",
+      "expandAll": "Mở tất cả",
+      "collapseAll": "Thu gọn tất cả",
+      "expand": "Mở {{name}}",
+      "collapse": "Thu gọn {{name}}",
+      "people": "{{count}} người",
+      "you": "Bạn",
+      "showMore": "Xem thêm {{count}} người",
+      "empty": "Chưa có phòng ban đang hoạt động."
     }
   },
   "employees": {

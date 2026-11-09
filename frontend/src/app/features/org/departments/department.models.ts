@@ -1,3 +1,5 @@
+import { normalizeSearch } from '../../../shared/format/search';
+
 /** Kiểu dữ liệu và hàm thuần cho cây phòng ban (ORG-01), khớp `org.api.DepartmentDtos`. */
 
 export interface Department {
@@ -51,14 +53,14 @@ export function flattenTree(nodes: readonly DepartmentNode[]): Department[] {
  * Trả null khi không có từ khóa.
  */
 export function matchingIds(departments: readonly Department[], query: string): Set<number> | null {
-  const q = normalize(query);
+  const q = normalizeSearch(query);
   if (!q) {
     return null;
   }
   const byId = new Map(departments.map((d) => [d.id, d]));
   const keep = new Set<number>();
   for (const d of departments) {
-    if (normalize(d.name).includes(q) || normalize(d.code).includes(q)) {
+    if (normalizeSearch(d.name).includes(q) || normalizeSearch(d.code).includes(q)) {
       for (const id of ancestorIds(d)) {
         if (byId.has(id)) {
           keep.add(id);
@@ -83,14 +85,4 @@ export function canMoveTo(dragged: Department, target: Department | null): boole
     return dragged.parentId !== null;
   }
   return target.active && !target.path.startsWith(dragged.path) && target.id !== dragged.parentId;
-}
-
-function normalize(text: string): string {
-  return text
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/đ/g, 'd')
-    .replace(/Đ/g, 'D')
-    .toLowerCase()
-    .trim();
 }

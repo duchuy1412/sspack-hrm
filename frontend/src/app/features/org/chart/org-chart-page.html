@@ -1,0 +1,170 @@
+<div class="toolbar">
+  <div class="field search">
+    <label class="field-label" for="chart-search">{{ 'org.chart.search' | transloco }}</label>
+    <input
+      id="chart-search"
+      type="search"
+      [ngModel]="query()"
+      (ngModelChange)="onQuery($event)"
+      [placeholder]="'org.chart.searchPlaceholder' | transloco"
+      aria-describedby="chart-search-result"
+      (keydown.enter)="$event.preventDefault(); step($any($event).shiftKey ? -1 : 1)"
+    />
+  </div>
+  @if (search(); as s) {
+    <div class="search-nav">
+      <span id="chart-search-result" class="muted" role="status">
+        @if (s.matches.length) {
+          {{ 'org.chart.matchOf' | transloco: { current: current() + 1, count: s.matches.length } }}
+        } @else {
+          {{ 'org.chart.noMatch' | transloco }}
+        }
+      </span>
+      <button
+        type="button"
+        class="btn"
+        [disabled]="!s.matches.length"
+        (click)="step(-1)"
+        [attr.aria-label]="'org.chart.previousMatch' | transloco"
+      >
+        ‹
+      </button>
+      <button
+        type="button"
+        class="btn"
+        [disabled]="!s.matches.length"
+        (click)="step(1)"
+        [attr.aria-label]="'org.chart.nextMatch' | transloco"
+      >
+        ›
+      </button>
+    </div>
+  } @else {
+    <span id="chart-search-result" class="muted">
+      @if (!loading()) {
+        {{ 'org.chart.total' | transloco: { count: total() } }}
+      }
+    </span>
+    <div class="search-nav">
+      <button type="button" class="link-button" (click)="setAll(true)">
+        {{ 'org.chart.expandAll' | transloco }}
+      </button>
+      <button type="button" class="link-button" (click)="setAll(false)">
+        {{ 'org.chart.collapseAll' | transloco }}
+      </button>
+    </div>
+  }
+</div>
+
+@if (error(); as message) {
+  <p class="alert" role="alert">{{ message }}</p>
+}
+
+<section
+  class="card chart"
+  [attr.aria-busy]="loading()"
+  [attr.aria-label]="'org.tabs.chart' | transloco"
+>
+  @if (loading()) {
+    <p class="muted">{{ 'admin.loading' | transloco }}</p>
+  } @else if (roots().length === 0) {
+    <p class="muted">{{ 'org.chart.empty' | transloco }}</p>
+  } @else {
+    <ul class="tree" role="list">
+      @for (node of roots(); track node.department.id) {
+        <ng-container *ngTemplateOutlet="nodeTpl; context: { $implicit: node }" />
+      }
+    </ul>
+  }
+</section>
+
+<ng-template #nodeTpl let-node>
+  <li class="branch" [attr.data-department]="node.department.id">
+    <div class="unit">
+      @if (node.children.length) {
+        <button
+          type="button"
+          class="toggle"
+          [attr.aria-expanded]="isOpen(node)"
+          [attr.aria-controls]="'unit-' + node.department.id"
+          (click)="toggle(node)"
+        >
+          <svg
+            class="caret"
+            [class.open]="isOpen(node)"
+            viewBox="0 0 16 16"
+            width="16"
+            height="16"
+            aria-hidden="true"
+          >
+            <path
+              d="M6 3.5 10.5 8 6 12.5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.75"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <span class="visually-hidden">{{
+            (isOpen(node) ? 'org.chart.collapse' : 'org.chart.expand')
+              | transloco: { name: node.department.name }
+          }}</span>
+        </button>
+      } @else {
+        <span class="toggle-spacer" aria-hidden="true"></span>
+      }
+      <h2 class="unit-name">{{ node.department.name }}</h2>
+      <span class="chip">{{ 'org.chart.people' | transloco: { count: node.total } }}</span>
+    </div>
+
+    @if (node.department.members.length) {
+      <ul class="members" role="list">
+        @for (m of node.department.members; track m.id; let i = $index) {
+          @if (i < preview || showAllMembers(node)) {
+            <li
+              class="member"
+              [attr.data-member]="m.id"
+              [class.match]="search()?.memberIds?.has(m.id)"
+              [class.current]="currentMemberId() === m.id"
+            >
+              @if (m.avatarUrl) {
+                <img class="avatar" [src]="m.avatarUrl" alt="" />
+              } @else {
+                <span class="avatar" aria-hidden="true">{{ initials(m.fullName) }}</span>
+              }
+              <span class="member-text">
+                @if (m.profileVisible) {
+                  <a class="member-name" [routerLink]="['/employees', m.id]">{{ m.fullName }}</a>
+                } @else {
+                  <span class="member-name">{{ m.fullName }}</span>
+                }
+                <span class="muted">{{ m.positionName }}</span>
+              </span>
+              @if (m.self) {
+                <span class="chip chip-brand">{{ 'org.chart.you' | transloco }}</span>
+              }
+            </li>
+          }
+        }
+      </ul>
+      @if (!showAllMembers(node)) {
+        <button type="button" class="link-button more" (click)="showMore(node)">
+          {{
+            'org.chart.showMore'
+              | transloco
+                : { count: node.department.members.length - preview, name: node.department.name }
+          }}
+        </button>
+      }
+    }
+
+    @if (node.children.length && isOpen(node)) {
+      <ul class="tree" role="list" [id]="'unit-' + node.department.id">
+        @for (child of node.children; track child.department.id) {
+          <ng-container *ngTemplateOutlet="nodeTpl; context: { $implicit: child }" />
+        }
+      </ul>
+    }
+  </li>
+</ng-template>
