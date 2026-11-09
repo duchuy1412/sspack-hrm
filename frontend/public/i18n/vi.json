@@ -245,9 +245,27 @@
     "roles": "Vai trò",
     "users": "Tài khoản",
     "refresh_tokens": "Phiên đăng nhập",
-    "departments": "Phòng ban"
+    "departments": "Phòng ban",
+    "job_grades": "Cấp bậc",
+    "positions": "Chức danh"
   },
   "org": {
+    "title": "Cơ cấu tổ chức",
+    "tabs": {
+      "departments": "Phòng ban",
+      "positions": "Chức danh",
+      "jobGrades": "Cấp bậc"
+    },
+    "status": {
+      "active": "Đang hoạt động",
+      "inactive": "Ngừng hoạt động"
+    },
+    "actions": {
+      "edit": "Sửa",
+      "deactivate": "Ngừng hoạt động",
+      "activate": "Hoạt động lại",
+      "delete": "Xóa"
+    },
     "departments": {
       "title": "Cơ cấu tổ chức",
       "search": "Tìm phòng ban",
@@ -299,6 +317,97 @@
       "deleted": "Đã xóa {{name}}.",
       "currentParent": "(hiện tại)"
     },
+    "positions": {
+      "search": "Tìm chức danh",
+      "searchPlaceholder": "Nhập tên hoặc mã",
+      "gradeFilter": "Cấp bậc",
+      "allGrades": "Tất cả cấp bậc",
+      "showInactive": "Hiện chức danh ngừng hoạt động",
+      "add": "Thêm chức danh",
+      "empty": "Chưa có chức danh nào.",
+      "noMatch": "Không có chức danh nào khớp bộ lọc.",
+      "gradeInactive": "Cấp bậc ngừng",
+      "columns": {
+        "code": "Mã",
+        "name": "Tên chức danh",
+        "grade": "Cấp bậc",
+        "range": "Khung lương",
+        "employees": "Nhân viên",
+        "status": "Trạng thái",
+        "actions": "Thao tác"
+      },
+      "createTitle": "Thêm chức danh",
+      "editTitle": "Sửa chức danh",
+      "fields": {
+        "code": "Mã chức danh",
+        "name": "Tên chức danh",
+        "grade": "Cấp bậc"
+      },
+      "hints": {
+        "code": "Chữ in hoa, số, gạch dưới hoặc gạch ngang, vd KS-QC."
+      },
+      "chooseGrade": "Chọn cấp bậc",
+      "gradeRange": "Khung lương: {{range}}",
+      "noGrades": "Chưa có cấp bậc đang hoạt động. Hãy thêm cấp bậc trước.",
+      "validation": {
+        "codeRequired": "Vui lòng nhập mã chức danh",
+        "codePattern": "Mã gồm 2–30 ký tự: chữ, số, dấu gạch dưới hoặc gạch ngang",
+        "nameRequired": "Vui lòng nhập tên chức danh",
+        "nameTooLong": "Tên chức danh tối đa 150 ký tự",
+        "jobGradeIdRequired": "Vui lòng chọn cấp bậc"
+      },
+      "confirmDeactivate": "Ngừng hoạt động chức danh \"{{name}}\"? Nhân viên đang giữ chức danh không bị ảnh hưởng.",
+      "confirmDelete": "Xóa chức danh \"{{name}}\"? Thao tác này không hoàn tác được.",
+      "created": "Đã thêm chức danh {{name}}.",
+      "updated": "Đã lưu chức danh {{name}}.",
+      "deactivated": "Đã ngừng hoạt động chức danh {{name}}.",
+      "activated": "Chức danh {{name}} đã hoạt động lại.",
+      "deleted": "Đã xóa chức danh {{name}}."
+    },
+    "jobGrades": {
+      "intro": "Mỗi cấp bậc có một khung lương. Chức danh gắn với cấp bậc nào thì dùng khung lương của cấp bậc đó.",
+      "showInactive": "Hiện cấp bậc ngừng hoạt động",
+      "add": "Thêm cấp bậc",
+      "empty": "Chưa có cấp bậc nào.",
+      "columns": {
+        "code": "Mã",
+        "name": "Tên cấp bậc",
+        "range": "Khung lương",
+        "positions": "Chức danh",
+        "status": "Trạng thái",
+        "actions": "Thao tác"
+      },
+      "createTitle": "Thêm cấp bậc",
+      "editTitle": "Sửa cấp bậc",
+      "fields": {
+        "code": "Mã cấp bậc",
+        "name": "Tên cấp bậc",
+        "minSalary": "Lương tối thiểu (₫)",
+        "maxSalary": "Lương tối đa (₫)"
+      },
+      "hints": {
+        "code": "Chữ in hoa, số, gạch dưới hoặc gạch ngang, vd G3.",
+        "money": "Nhập số đồng, vd 12.000.000. Khung một mức thì nhập hai số bằng nhau."
+      },
+      "preview": "Khung lương: {{range}}",
+      "validation": {
+        "codeRequired": "Vui lòng nhập mã cấp bậc",
+        "codePattern": "Mã gồm 2–20 ký tự: chữ, số, dấu gạch dưới hoặc gạch ngang",
+        "nameRequired": "Vui lòng nhập tên cấp bậc",
+        "nameTooLong": "Tên cấp bậc tối đa 100 ký tự",
+        "minSalaryRequired": "Vui lòng nhập lương tối thiểu",
+        "maxSalaryRequired": "Vui lòng nhập lương tối đa",
+        "money": "Nhập số đồng nguyên lớn hơn 0, tối đa 15 chữ số",
+        "range": "Lương tối đa phải lớn hơn hoặc bằng lương tối thiểu"
+      },
+      "confirmDeactivate": "Ngừng hoạt động cấp bậc \"{{name}}\"? Không gắn được chức danh mới vào cấp bậc này nữa.",
+      "confirmDelete": "Xóa cấp bậc \"{{name}}\"? Thao tác này không hoàn tác được.",
+      "created": "Đã thêm cấp bậc {{name}}.",
+      "updated": "Đã lưu cấp bậc {{name}}.",
+      "deactivated": "Đã ngừng hoạt động cấp bậc {{name}}.",
+      "activated": "Cấp bậc {{name}} đã hoạt động lại.",
+      "deleted": "Đã xóa cấp bậc {{name}}."
+    },
     "errors": {
       "DEPARTMENT_NOT_FOUND": "Không tìm thấy phòng ban.",
       "DEPARTMENT_PARENT_NOT_FOUND": "Không tìm thấy phòng ban cấp trên.",
@@ -310,7 +419,23 @@
       "DEPARTMENT_HAS_EMPLOYEES": "Phòng ban đã có {{employeeCount}} nhân viên nên không xóa được. Hãy chọn Ngừng hoạt động.",
       "DEPARTMENT_HAS_ACTIVE_CHILDREN": "Phòng ban còn {{childCount}} phòng ban cấp dưới đang hoạt động.",
       "DEPARTMENT_HAS_ACTIVE_EMPLOYEES": "Phòng ban còn {{employeeCount}} nhân viên đang làm việc. Hãy điều chuyển họ trước.",
-      "DEPARTMENT_IN_USE": "Phòng ban đang được dùng ở dữ liệu khác nên không xóa được. Hãy chọn Ngừng hoạt động."
+      "DEPARTMENT_IN_USE": "Phòng ban đang được dùng ở dữ liệu khác nên không xóa được. Hãy chọn Ngừng hoạt động.",
+      "JOB_GRADE_NOT_FOUND": "Không tìm thấy cấp bậc.",
+      "JOB_GRADE_CODE_EXISTS": "Mã cấp bậc đã tồn tại.",
+      "JOB_GRADE_CODE_INVALID": "Mã cấp bậc không hợp lệ.",
+      "JOB_GRADE_SALARY_INVALID": "Mức lương phải là số đồng nguyên lớn hơn 0 và không quá 15 chữ số.",
+      "JOB_GRADE_RANGE_INVALID": "Lương tối thiểu không được lớn hơn lương tối đa.",
+      "JOB_GRADE_HAS_POSITIONS": "Cấp bậc đang có {{positionCount}} chức danh nên không xóa được. Hãy chọn Ngừng hoạt động.",
+      "JOB_GRADE_HAS_ACTIVE_POSITIONS": "Cấp bậc còn {{positionCount}} chức danh đang hoạt động. Hãy chuyển hoặc ngừng các chức danh đó trước.",
+      "JOB_GRADE_IN_USE": "Cấp bậc đang được dùng ở dữ liệu khác nên không xóa được. Hãy chọn Ngừng hoạt động.",
+      "POSITION_NOT_FOUND": "Không tìm thấy chức danh.",
+      "POSITION_CODE_EXISTS": "Mã chức danh đã tồn tại.",
+      "POSITION_CODE_INVALID": "Mã chức danh không hợp lệ.",
+      "POSITION_GRADE_REQUIRED": "Chức danh phải thuộc một cấp bậc của công ty.",
+      "POSITION_GRADE_NOT_FOUND": "Không tìm thấy cấp bậc.",
+      "POSITION_GRADE_INACTIVE": "Cấp bậc đã ngừng hoạt động. Hãy chọn cấp bậc khác hoặc cho cấp bậc hoạt động lại.",
+      "POSITION_HAS_EMPLOYEES": "Chức danh đã có {{employeeCount}} nhân viên nên không xóa được. Hãy chọn Ngừng hoạt động.",
+      "POSITION_IN_USE": "Chức danh đang được dùng ở dữ liệu khác nên không xóa được. Hãy chọn Ngừng hoạt động."
     }
   }
 }

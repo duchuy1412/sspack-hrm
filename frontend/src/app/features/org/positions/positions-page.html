@@ -1,0 +1,215 @@
+<div class="toolbar">
+  <div class="field search">
+    <label class="field-label" for="position-search">{{ 'org.positions.search' | transloco }}</label>
+    <input
+      id="position-search"
+      type="search"
+      [ngModel]="query()"
+      (ngModelChange)="query.set($event)"
+      [placeholder]="'org.positions.searchPlaceholder' | transloco"
+    />
+  </div>
+  <div class="field">
+    <label class="field-label" for="position-grade-filter">{{
+      'org.positions.gradeFilter' | transloco
+    }}</label>
+    <select
+      id="position-grade-filter"
+      [ngModel]="gradeFilter()"
+      (ngModelChange)="gradeFilter.set($event)"
+    >
+      <option value="">{{ 'org.positions.allGrades' | transloco }}</option>
+      @for (g of gradeOptions(); track g.id) {
+        <option [value]="g.id">{{ g.label }}</option>
+      }
+    </select>
+  </div>
+  <label class="check">
+    <input
+      type="checkbox"
+      [checked]="includeInactive()"
+      (change)="toggleInactive($any($event.target).checked)"
+    />
+    <span>{{ 'org.positions.showInactive' | transloco }}</span>
+  </label>
+  @if (canManage()) {
+    <button type="button" class="btn btn-primary" (click)="openCreate()">
+      {{ 'org.positions.add' | transloco }}
+    </button>
+  }
+</div>
+
+@if (error(); as message) {
+  <p class="alert" role="alert">{{ message }}</p>
+}
+@if (notice(); as message) {
+  <p class="notice" role="status">{{ message }}</p>
+}
+
+<section class="card table-wrap" [attr.aria-busy]="loading() || busy()">
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">{{ 'org.positions.columns.code' | transloco }}</th>
+        <th scope="col">{{ 'org.positions.columns.name' | transloco }}</th>
+        <th scope="col">{{ 'org.positions.columns.grade' | transloco }}</th>
+        @if (canManage()) {
+          <th scope="col" class="num">{{ 'org.positions.columns.range' | transloco }}</th>
+        }
+        <th scope="col" class="num">{{ 'org.positions.columns.employees' | transloco }}</th>
+        <th scope="col">{{ 'org.positions.columns.status' | transloco }}</th>
+        @if (canManage()) {
+          <th scope="col">
+            <span class="visually-hidden">{{ 'org.positions.columns.actions' | transloco }}</span>
+          </th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (p of visible(); track p.id) {
+        <tr [class.inactive]="!p.active" [attr.data-id]="p.id">
+          <td class="code">{{ p.code }}</td>
+          <td class="name">{{ p.name }}</td>
+          <td class="grade">
+            <span class="grade-cell">
+              <span class="grade-code">{{ p.jobGradeCode }}</span>
+              @if (!p.jobGradeActive) {
+                <span class="chip">{{ 'org.positions.gradeInactive' | transloco }}</span>
+              }
+            </span>
+            <span class="muted">{{ p.jobGradeName }}</span>
+          </td>
+          @if (canManage()) {
+            <td class="num range">{{ rangeOf(p) }}</td>
+          }
+          <td class="num">{{ p.workingEmployeeCount }}</td>
+          <td>
+            <span class="chip" [class.chip-brand]="p.active">
+              {{ (p.active ? 'org.status.active' : 'org.status.inactive') | transloco }}
+            </span>
+          </td>
+          @if (canManage()) {
+            <td>
+              <div class="actions">
+                <button type="button" class="link-button" (click)="openEdit(p)">
+                  {{ 'org.actions.edit' | transloco }}
+                  <span class="visually-hidden">{{ p.name }}</span>
+                </button>
+                <button type="button" class="link-button" (click)="setActive(p, !p.active)">
+                  {{ (p.active ? 'org.actions.deactivate' : 'org.actions.activate') | transloco }}
+                  <span class="visually-hidden">{{ p.name }}</span>
+                </button>
+                @if (p.employeeCount === 0) {
+                  <button type="button" class="link-button danger" (click)="remove(p)">
+                    {{ 'org.actions.delete' | transloco }}
+                    <span class="visually-hidden">{{ p.name }}</span>
+                  </button>
+                }
+              </div>
+            </td>
+          }
+        </tr>
+      } @empty {
+        <tr>
+          <td [attr.colspan]="canManage() ? 7 : 5" class="muted">
+            {{
+              (loading()
+                ? 'admin.loading'
+                : positions().length
+                  ? 'org.positions.noMatch'
+                  : 'org.positions.empty'
+              ) | transloco
+            }}
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</section>
+
+<dialog
+  #editDialog
+  class="dialog card"
+  aria-labelledby="position-edit-title"
+  (cancel)="closeDialog()"
+>
+  @if (editing(); as current) {
+    <form class="dialog-body" [formGroup]="form" (ngSubmit)="save()" novalidate>
+      <h2 id="position-edit-title" class="heading">
+        {{
+          (current === 'new' ? 'org.positions.createTitle' : 'org.positions.editTitle') | transloco
+        }}
+      </h2>
+      <div class="field">
+        <label class="field-label" for="position-code">{{
+          'org.positions.fields.code' | transloco
+        }}</label>
+        <input
+          id="position-code"
+          type="text"
+          formControlName="code"
+          autocomplete="off"
+          [attr.aria-invalid]="fieldError('code') ? true : null"
+        />
+        @if (fieldError('code'); as message) {
+          <span class="field-error">{{ message }}</span>
+        } @else {
+          <span class="muted">{{ 'org.positions.hints.code' | transloco }}</span>
+        }
+      </div>
+      <div class="field">
+        <label class="field-label" for="position-name">{{
+          'org.positions.fields.name' | transloco
+        }}</label>
+        <input
+          id="position-name"
+          type="text"
+          formControlName="name"
+          [attr.aria-invalid]="fieldError('name') ? true : null"
+        />
+        @if (fieldError('name'); as message) {
+          <span class="field-error">{{ message }}</span>
+        }
+      </div>
+      <div class="field">
+        <label class="field-label" for="position-grade">{{
+          'org.positions.fields.grade' | transloco
+        }}</label>
+        <select
+          id="position-grade"
+          formControlName="jobGradeId"
+          [attr.aria-invalid]="fieldError('jobGradeId') ? true : null"
+          aria-describedby="position-grade-range"
+        >
+          <option value="" disabled>{{ 'org.positions.chooseGrade' | transloco }}</option>
+          @for (g of gradeChoices(); track g.id) {
+            <option [value]="g.id">
+              {{ g.code }} – {{ g.name }}{{ g.active ? '' : ' (' + ('org.status.inactive' | transloco) + ')' }}
+            </option>
+          }
+        </select>
+        @if (fieldError('jobGradeId'); as message) {
+          <span class="field-error">{{ message }}</span>
+        }
+        <span id="position-grade-range" class="muted">
+          @if (selectedRange(); as range) {
+            {{ 'org.positions.gradeRange' | transloco: { range } }}
+          } @else if (gradeChoices().length === 0) {
+            {{ 'org.positions.noGrades' | transloco }}
+          }
+        </span>
+      </div>
+      @if (dialogError(); as message) {
+        <p class="alert" role="alert">{{ message }}</p>
+      }
+      <div class="dialog-actions">
+        <button type="button" class="btn" (click)="closeDialog()">
+          {{ 'admin.cancel' | transloco }}
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="busy()">
+          {{ (busy() ? 'admin.saving' : 'admin.save') | transloco }}
+        </button>
+      </div>
+    </form>
+  }
+</dialog>

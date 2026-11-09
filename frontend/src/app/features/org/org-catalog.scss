@@ -1,0 +1,118 @@
+// Kiểu riêng của hai trang danh mục chức danh và cấp bậc (ORG-02). Thành phần chung ở page-shared.scss.
+
+.toolbar {
+  justify-content: flex-start;
+}
+
+.toolbar .btn-primary {
+  margin-left: auto;
+}
+
+.intro {
+  flex: 1 1 320px;
+  margin: 0;
+}
+
+.search {
+  flex: 1 1 240px;
+  max-width: 360px;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  cursor: pointer;
+}
+
+tr.inactive td {
+  color: var(--ink-muted);
+}
+
+td.code {
+  font: var(--text-label);
+  white-space: nowrap;
+}
+
+td.range {
+  white-space: nowrap;
+}
+
+td.name {
+  min-width: 180px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2) var(--space-4);
+}
+
+.actions .link-button {
+  white-space: nowrap;
+}
+
+.link-button.danger {
+  color: var(--danger);
+}
+
+td.grade {
+  min-width: 180px;
+
+  .muted {
+    display: block;
+  }
+}
+
+.grade-cell {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.grade-code {
+  font: var(--text-label);
+}
+
+.dialog {
+  width: min(520px, calc(100vw - 2 * var(--space-4)));
+  padding: 0;
+  color: var(--ink);
+
+  &::backdrop {
+    background: color-mix(in srgb, var(--ink) 40%, transparent);
+  }
+}
+
+.dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.money-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+
+  input {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@media (max-width: 560px) {
+  .money-row {
+    grid-template-columns: 1fr;
+  }
+}

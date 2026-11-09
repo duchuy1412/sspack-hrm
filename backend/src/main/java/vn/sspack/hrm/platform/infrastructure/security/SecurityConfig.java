@@ -77,6 +77,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/departments", "/api/v1/departments/**")
                         .hasAuthority("org:read")
                         .requestMatchers("/api/v1/departments", "/api/v1/departments/**").hasAuthority("org:manage")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/positions", "/api/v1/positions/**")
+                        .hasAuthority("org:read")
+                        .requestMatchers("/api/v1/positions", "/api/v1/positions/**").hasAuthority("org:manage")
+                        // Khung lương là dữ liệu nhạy cảm: xem cũng cần org:manage
+                        .requestMatchers("/api/v1/job-grades", "/api/v1/job-grades/**").hasAuthority("org:manage")
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(o -> o
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(SecurityConfig::toAuthentication))
