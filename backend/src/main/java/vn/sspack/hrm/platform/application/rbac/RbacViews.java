@@ -4,7 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Set;
 
-import vn.sspack.hrm.platform.domain.auth.DataScope;
+import vn.sspack.hrm.shared.security.DataScope;
 
 /** Kết quả đọc và lệnh ghi của phân hệ phân quyền (PLT-03). Không lộ entity ra ngoài application. */
 public final class RbacViews {

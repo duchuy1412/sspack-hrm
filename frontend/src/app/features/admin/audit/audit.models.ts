@@ -4,7 +4,15 @@ export const AUDIT_ACTIONS = ['CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT', '
 export type AuditAction = (typeof AUDIT_ACTIONS)[number];
 
 /** Bảng đang được ghi nhật ký; khớp enum `AuditEntity` ở backend. */
-export const AUDIT_ENTITIES = ['roles', 'users', 'refresh_tokens', 'departments'] as const;
+export const AUDIT_ENTITIES = [
+  'roles',
+  'users',
+  'refresh_tokens',
+  'departments',
+  'job_grades',
+  'positions',
+  'employees',
+] as const;
 
 export type JsonValue =
   string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };

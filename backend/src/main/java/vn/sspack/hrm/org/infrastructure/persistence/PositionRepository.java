@@ -1,5 +1,6 @@
 package vn.sspack.hrm.org.infrastructure.persistence;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +13,8 @@ public interface PositionRepository extends JpaRepository<Position, Long> {
     List<Position> findByCompanyIdOrderByCodeAsc(Long companyId);
 
     Optional<Position> findByIdAndCompanyId(Long id, Long companyId);
+
+    List<Position> findByCompanyIdAndIdIn(Long companyId, Collection<Long> ids);
 
     boolean existsByCompanyIdAndCode(Long companyId, String code);
 

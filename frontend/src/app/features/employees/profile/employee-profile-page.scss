@@ -1,0 +1,83 @@
+// Trang hồ sơ nhân viên (EMP-01): ba khối thông tin dạng lưới, xuống một cột trên điện thoại.
+
+.back {
+  align-self: flex-start;
+  color: var(--brand-strong);
+  font: var(--text-label);
+}
+
+.titles p {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.profile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-4) var(--space-6);
+  margin: 0;
+
+  .wide {
+    grid-column: 1 / -1;
+  }
+}
+
+input[type='email'],
+input[type='tel'],
+input[type='date'] {
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  color: var(--ink);
+  font: var(--text-body);
+
+  &[aria-invalid='true'] {
+    border-color: var(--danger);
+  }
+}
+
+.facts {
+  dt {
+    color: var(--ink-muted);
+    font: var(--text-label);
+  }
+
+  dd {
+    margin: var(--space-1) 0 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+@media (max-width: 560px) {
+  .group {
+    padding: var(--space-4);
+  }
+}

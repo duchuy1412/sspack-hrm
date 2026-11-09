@@ -247,7 +247,8 @@
     "refresh_tokens": "Phiên đăng nhập",
     "departments": "Phòng ban",
     "job_grades": "Cấp bậc",
-    "positions": "Chức danh"
+    "positions": "Chức danh",
+    "employees": "Nhân viên"
   },
   "org": {
     "title": "Cơ cấu tổ chức",
@@ -436,6 +437,119 @@
       "POSITION_GRADE_INACTIVE": "Cấp bậc đã ngừng hoạt động. Hãy chọn cấp bậc khác hoặc cho cấp bậc hoạt động lại.",
       "POSITION_HAS_EMPLOYEES": "Chức danh đã có {{employeeCount}} nhân viên nên không xóa được. Hãy chọn Ngừng hoạt động.",
       "POSITION_IN_USE": "Chức danh đang được dùng ở dữ liệu khác nên không xóa được. Hãy chọn Ngừng hoạt động."
+    }
+  },
+  "employees": {
+    "title": "Nhân viên",
+    "list": {
+      "count": "{{count}} nhân viên khớp bộ lọc",
+      "add": "Thêm nhân viên",
+      "search": "Tìm kiếm",
+      "searchPlaceholder": "Tên, mã nhân viên, email",
+      "department": "Phòng ban",
+      "allDepartments": "Tất cả phòng ban",
+      "status": "Trạng thái",
+      "empty": "Không có nhân viên nào khớp bộ lọc.",
+      "range": "Hiển thị {{from}}–{{to}} trong {{total}} nhân viên",
+      "pagination": "Phân trang",
+      "previous": "Trang trước",
+      "next": "Trang sau",
+      "pageOf": "Trang {{page}}/{{pages}}"
+    },
+    "columns": {
+      "code": "Mã NV",
+      "name": "Họ và tên",
+      "department": "Phòng ban",
+      "position": "Chức danh",
+      "hireDate": "Ngày vào làm",
+      "status": "Trạng thái"
+    },
+    "statusFilters": {
+      "working": "Đang làm việc",
+      "PROBATION": "Thử việc",
+      "ACTIVE": "Chính thức",
+      "ON_LEAVE": "Nghỉ dài hạn",
+      "left": "Đã nghỉ việc",
+      "all": "Tất cả"
+    },
+    "statuses": {
+      "PROBATION": "Thử việc",
+      "ACTIVE": "Chính thức",
+      "ON_LEAVE": "Nghỉ dài hạn",
+      "RESIGNED": "Đã nghỉ việc",
+      "TERMINATED": "Chấm dứt hợp đồng"
+    },
+    "genders": {
+      "MALE": "Nam",
+      "FEMALE": "Nữ",
+      "OTHER": "Khác"
+    },
+    "groups": {
+      "work": "Công việc",
+      "personal": "Thông tin cá nhân",
+      "contact": "Liên hệ",
+      "personalContact": "Cá nhân và liên hệ"
+    },
+    "fields": {
+      "code": "Mã nhân viên",
+      "fullName": "Họ và tên",
+      "gender": "Giới tính",
+      "dateOfBirth": "Ngày sinh",
+      "workEmail": "Email công việc",
+      "personalEmail": "Email cá nhân",
+      "phone": "Điện thoại",
+      "address": "Địa chỉ",
+      "department": "Phòng ban",
+      "position": "Chức danh",
+      "hireDate": "Ngày vào làm",
+      "status": "Trạng thái"
+    },
+    "hints": {
+      "code": "Mã gợi ý tiếp theo, có thể sửa. Chữ in hoa, số, gạch dưới hoặc gạch ngang.",
+      "statusCreate": "Hồ sơ mới là Thử việc hoặc Chính thức.",
+      "statusUpdate": "Nghỉ việc được xử lý ở chức năng nghỉ việc, không chọn ở đây."
+    },
+    "profile": {
+      "back": "← Danh sách nhân viên",
+      "createTitle": "Thêm nhân viên",
+      "chooseDepartment": "Chọn phòng ban",
+      "choosePosition": "Chọn chức danh",
+      "notSpecified": "Không ghi",
+      "discard": "Hoàn tác thay đổi",
+      "created": "Đã thêm nhân viên {{name}}.",
+      "updated": "Đã lưu hồ sơ {{name}}.",
+      "personalHidden": "Ngày sinh, email cá nhân, điện thoại và địa chỉ chỉ hiển thị với bộ phận nhân sự và chính nhân viên."
+    },
+    "validation": {
+      "codeRequired": "Vui lòng nhập mã nhân viên",
+      "codePattern": "Mã gồm 2–30 ký tự: chữ, số, dấu gạch dưới hoặc gạch ngang",
+      "fullNameRequired": "Vui lòng nhập họ và tên",
+      "fullNameTooLong": "Họ và tên tối đa 150 ký tự",
+      "emailInvalid": "Email không hợp lệ",
+      "workEmailTooLong": "Email tối đa 255 ký tự",
+      "personalEmailTooLong": "Email tối đa 255 ký tự",
+      "phonePattern": "Số điện thoại gồm 9–15 chữ số, có thể bắt đầu bằng dấu +",
+      "addressTooLong": "Địa chỉ tối đa 500 ký tự",
+      "departmentIdRequired": "Vui lòng chọn phòng ban",
+      "positionIdRequired": "Vui lòng chọn chức danh",
+      "hireDateRequired": "Vui lòng nhập ngày vào làm",
+      "statusRequired": "Vui lòng chọn trạng thái",
+      "birthDate": "Ngày sinh phải trước ngày vào làm và không ở tương lai"
+    },
+    "errors": {
+      "EMPLOYEE_NOT_FOUND": "Không tìm thấy nhân viên, hoặc hồ sơ nằm ngoài phạm vi bạn được xem.",
+      "EMPLOYEE_CODE_EXISTS": "Mã nhân viên đã tồn tại.",
+      "EMPLOYEE_CODE_INVALID": "Mã nhân viên gồm 2–30 ký tự: chữ in hoa, chữ số, dấu gạch dưới hoặc gạch ngang.",
+      "EMPLOYEE_NAME_REQUIRED": "Vui lòng nhập họ và tên (tối đa 150 ký tự).",
+      "EMPLOYEE_WORK_EMAIL_EXISTS": "Email công việc đã được dùng cho nhân viên khác.",
+      "EMPLOYEE_BIRTH_DATE_INVALID": "Ngày sinh phải trước ngày vào làm và không ở tương lai.",
+      "EMPLOYEE_PHONE_INVALID": "Số điện thoại gồm 9–15 chữ số, có thể bắt đầu bằng dấu +.",
+      "EMPLOYEE_STATUS_NOT_ALLOWED": "Không chọn được trạng thái này. Nghỉ việc được xử lý ở chức năng nghỉ việc.",
+      "EMPLOYEE_DEPARTMENT_NOT_FOUND": "Không tìm thấy phòng ban.",
+      "EMPLOYEE_POSITION_NOT_FOUND": "Không tìm thấy chức danh.",
+      "EMPLOYEE_DEPARTMENT_INACTIVE": "Phòng ban đã ngừng hoạt động. Hãy chọn phòng ban khác.",
+      "EMPLOYEE_POSITION_INACTIVE": "Chức danh đã ngừng hoạt động. Hãy chọn chức danh khác.",
+      "EMPLOYEE_OUT_OF_SCOPE": "Phòng ban nằm ngoài phạm vi dữ liệu bạn được quản lý."
     }
   }
 }

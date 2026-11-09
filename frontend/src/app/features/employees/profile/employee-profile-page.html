@@ -1,0 +1,317 @@
+<a class="back" routerLink="/employees">{{ 'employees.profile.back' | transloco }}</a>
+
+<header class="page-header">
+  <div class="titles">
+    <h1 class="display">
+      {{ isNew() ? ('employees.profile.createTitle' | transloco) : employee()?.fullName }}
+    </h1>
+    @if (employee(); as e) {
+      <p class="muted">
+        {{ e.code }} · {{ e.positionName }} · {{ e.departmentName }}
+        <span class="chip status" [attr.data-status]="e.status">{{
+          'employees.statuses.' + e.status | transloco
+        }}</span>
+      </p>
+    }
+  </div>
+</header>
+
+@if (notice(); as message) {
+  <p class="notice" role="status">{{ message }}</p>
+}
+@if (error(); as message) {
+  <p class="alert" role="alert">{{ message }}</p>
+}
+
+@if (loading()) {
+  <p class="muted" aria-live="polite">{{ 'admin.loading' | transloco }}</p>
+} @else if (editable()) {
+  <form class="profile" [formGroup]="form" (ngSubmit)="save()" novalidate>
+    <section class="card group" aria-labelledby="group-work">
+      <h2 id="group-work" class="subheading">{{ 'employees.groups.work' | transloco }}</h2>
+      <div class="grid">
+        <div class="field">
+          <label class="field-label" for="emp-code">{{
+            'employees.fields.code' | transloco
+          }}</label>
+          <input
+            id="emp-code"
+            type="text"
+            formControlName="code"
+            autocomplete="off"
+            [attr.aria-invalid]="fieldError('code') ? true : null"
+          />
+          @if (fieldError('code'); as message) {
+            <span class="field-error">{{ message }}</span>
+          } @else if (isNew()) {
+            <span class="muted">{{ 'employees.hints.code' | transloco }}</span>
+          }
+        </div>
+        <div class="field">
+          <label class="field-label" for="emp-hire">{{
+            'employees.fields.hireDate' | transloco
+          }}</label>
+          <input
+            id="emp-hire"
+            type="date"
+            formControlName="hireDate"
+            [attr.aria-invalid]="fieldError('hireDate') ? true : null"
+          />
+          @if (fieldError('hireDate'); as message) {
+            <span class="field-error">{{ message }}</span>
+          }
+        </div>
+        <div class="field">
+          <label class="field-label" for="emp-department">{{
+            'employees.fields.department' | transloco
+          }}</label>
+          <select
+            id="emp-department"
+            formControlName="departmentId"
+            [attr.aria-invalid]="fieldError('departmentId') ? true : null"
+          >
+            <option value="" disabled>
+              {{ 'employees.profile.chooseDepartment' | transloco }}
+            </option>
+            @for (d of departmentChoices(); track d.id) {
+              <option [value]="d.id">
+                {{ d.label }}{{ d.active ? '' : ' (' + ('org.status.inactive' | transloco) + ')' }}
+              </option>
+            }
+          </select>
+          @if (fieldError('departmentId'); as message) {
+            <span class="field-error">{{ message }}</span>
+          }
+        </div>
+        <div class="field">
+          <label class="field-label" for="emp-position">{{
+            'employees.fields.position' | transloco
+          }}</label>
+          <select
+            id="emp-position"
+            formControlName="positionId"
+            [attr.aria-invalid]="fieldError('positionId') ? true : null"
+          >
+            <option value="" disabled>{{ 'employees.profile.choosePosition' | transloco }}</option>
+            @for (p of positionChoices(); track p.id) {
+              <option [value]="p.id">
+                {{ p.name }} ({{ p.code }}){{
+                  p.active ? '' : ' – ' + ('org.status.inactive' | transloco)
+                }}
+              </option>
+            }
+          </select>
+          @if (fieldError('positionId'); as message) {
+            <span class="field-error">{{ message }}</span>
+          }
+        </div>
+        <div class="field">
+          <label class="field-label" for="emp-status">{{
+            'employees.fields.status' | transloco
+          }}</label>
+          <select
+            id="emp-status"
+            formControlName="status"
+            aria-describedby="emp-status-hint"
+            [attr.aria-invalid]="fieldError('status') ? true : null"
+          >
+            @for (s of statusChoices(); track s) {
+              <option [value]="s">{{ 'employees.statuses.' + s | transloco }}</option>
+            }
+          </select>
+          <span id="emp-status-hint" class="muted">{{
+            (isNew() ? 'employees.hints.statusCreate' : 'employees.hints.statusUpdate') | transloco
+          }}</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card group" aria-labelledby="group-personal">
+      <h2 id="group-personal" class="subheading">{{ 'employees.groups.personal' | transloco }}</h2>
+      <div class="grid">
+        <div class="field wide">
+          <label class="field-label" for="emp-name">{{
+            'employees.fields.fullName' | transloco
+          }}</label>
+          <input
+            id="emp-name"
+            type="text"
+            formControlName="fullName"
+            autocomplete="off"
+            [attr.aria-invalid]="fieldError('fullName') ? true : null"
+          />
+          @if (fieldError('fullName'); as message) {
+            <span class="field-error">{{ message }}</span>
+          }
+        </div>
+        <div class="field">
+          <label class="field-label" for="emp-gender">{{
+            'employees.fields.gender' | transloco
+          }}</label>
+          <select id="emp-gender" formControlName="gender">
+            <option value="">{{ 'employees.profile.notSpecified' | transloco }}</option>
+            @for (g of genders; track g) {
+              <option [value]="g">{{ 'employees.genders.' + g | transloco }}</option>
+            }
+          </select>
+        </div>
+        <div class="field">
+          <label class="field-label" for="emp-birth">{{
+            'employees.fields.dateOfBirth' | transloco
+          }}</label>
+          <input
+            id="emp-birth"
+            type="date"
+            formControlName="dateOfBirth"
+            [max]="today"
+            [attr.aria-invalid]="fieldError('dateOfBirth') ? true : null"
+          />
+          @if (fieldError('dateOfBirth'); as message) {
+            <span class="field-error">{{ message }}</span>
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="card group" aria-labelledby="group-contact">
+      <h2 id="group-contact" class="subheading">{{ 'employees.groups.contact' | transloco }}</h2>
+      <div class="grid">
+        <div class="field">
+          <label class="field-label" for="emp-work-email">{{
+            'employees.fields.workEmail' | transloco
+          }}</label>
+          <input
+            id="emp-work-email"
+            type="email"
+            formControlName="workEmail"
+            autocomplete="off"
+            [attr.aria-invalid]="fieldError('workEmail') ? true : null"
+          />
+          @if (fieldError('workEmail'); as message) {
+            <span class="field-error">{{ message }}</span>
+          }
+        </div>
+        <div class="field">
+          <label class="field-label" for="emp-personal-email">{{
+            'employees.fields.personalEmail' | transloco
+          }}</label>
+          <input
+            id="emp-personal-email"
+            type="email"
+            formControlName="personalEmail"
+            autocomplete="off"
+            [attr.aria-invalid]="fieldError('personalEmail') ? true : null"
+          />
+          @if (fieldError('personalEmail'); as message) {
+            <span class="field-error">{{ message }}</span>
+          }
+        </div>
+        <div class="field">
+          <label class="field-label" for="emp-phone">{{
+            'employees.fields.phone' | transloco
+          }}</label>
+          <input
+            id="emp-phone"
+            type="tel"
+            inputmode="tel"
+            formControlName="phone"
+            autocomplete="off"
+            [attr.aria-invalid]="fieldError('phone') ? true : null"
+          />
+          @if (fieldError('phone'); as message) {
+            <span class="field-error">{{ message }}</span>
+          }
+        </div>
+        <div class="field wide">
+          <label class="field-label" for="emp-address">{{
+            'employees.fields.address' | transloco
+          }}</label>
+          <textarea
+            id="emp-address"
+            rows="2"
+            formControlName="address"
+            [attr.aria-invalid]="fieldError('address') ? true : null"
+          ></textarea>
+          @if (fieldError('address'); as message) {
+            <span class="field-error">{{ message }}</span>
+          }
+        </div>
+      </div>
+    </section>
+
+    <div class="form-actions">
+      @if (isNew()) {
+        <a class="btn" routerLink="/employees">{{ 'admin.cancel' | transloco }}</a>
+      } @else {
+        <button type="button" class="btn" (click)="reset()" [disabled]="busy() || form.pristine">
+          {{ 'employees.profile.discard' | transloco }}
+        </button>
+      }
+      <button type="submit" class="btn btn-primary" [disabled]="busy()">
+        {{ (busy() ? 'admin.saving' : 'admin.save') | transloco }}
+      </button>
+    </div>
+  </form>
+} @else if (employee(); as e) {
+  <section class="card group" aria-labelledby="view-work">
+    <h2 id="view-work" class="subheading">{{ 'employees.groups.work' | transloco }}</h2>
+    <dl class="grid facts">
+      <div>
+        <dt>{{ 'employees.fields.code' | transloco }}</dt>
+        <dd>{{ e.code }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'employees.fields.hireDate' | transloco }}</dt>
+        <dd>{{ formatDate(e.hireDate) }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'employees.fields.department' | transloco }}</dt>
+        <dd>{{ e.departmentName }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'employees.fields.position' | transloco }}</dt>
+        <dd>{{ e.positionName ?? '—' }}</dd>
+      </div>
+    </dl>
+  </section>
+  <section class="card group" aria-labelledby="view-personal">
+    <h2 id="view-personal" class="subheading">
+      {{ 'employees.groups.personalContact' | transloco }}
+    </h2>
+    <dl class="grid facts">
+      <div>
+        <dt>{{ 'employees.fields.fullName' | transloco }}</dt>
+        <dd>{{ e.fullName }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'employees.fields.workEmail' | transloco }}</dt>
+        <dd>{{ e.workEmail ?? '—' }}</dd>
+      </div>
+      @if (e.personalVisible) {
+        <div>
+          <dt>{{ 'employees.fields.gender' | transloco }}</dt>
+          <dd>{{ e.gender ? ('employees.genders.' + e.gender | transloco) : '—' }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'employees.fields.dateOfBirth' | transloco }}</dt>
+          <dd>{{ formatDate(e.dateOfBirth) || '—' }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'employees.fields.personalEmail' | transloco }}</dt>
+          <dd>{{ e.personalEmail ?? '—' }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'employees.fields.phone' | transloco }}</dt>
+          <dd>{{ e.phone ?? '—' }}</dd>
+        </div>
+        <div class="wide">
+          <dt>{{ 'employees.fields.address' | transloco }}</dt>
+          <dd>{{ e.address ?? '—' }}</dd>
+        </div>
+      }
+    </dl>
+    @if (!e.personalVisible) {
+      <p class="muted">{{ 'employees.profile.personalHidden' | transloco }}</p>
+    }
+  </section>
+}

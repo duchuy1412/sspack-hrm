@@ -10,7 +10,8 @@ public enum AuditEntity {
     REFRESH_TOKENS("refresh_tokens"),
     DEPARTMENTS("departments"),
     JOB_GRADES("job_grades"),
-    POSITIONS("positions");
+    POSITIONS("positions"),
+    EMPLOYEES("employees");
 
     private final String table;
 

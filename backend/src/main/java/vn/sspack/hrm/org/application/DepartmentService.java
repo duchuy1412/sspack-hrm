@@ -155,7 +155,10 @@ public class DepartmentService {
 
     @Transactional
     public DepartmentView changeStatus(RequestActor actor, long id, StatusCommand command) {
-        Department department = load(actor.companyId(), id);
+        // Khóa dòng: nhân viên được gán vào phòng ban (EMP-01) cũng khóa dòng này, nên không lọt nhân viên mới
+        // vào phòng ban đang bị ngừng hoạt động cùng lúc.
+        Department department = departments.findForUpdate(id, actor.companyId())
+                .orElseThrow(DepartmentService::notFound);
         checkVersion(department, command.version());
         if (department.isActive() == command.active()) {
             return view(department);

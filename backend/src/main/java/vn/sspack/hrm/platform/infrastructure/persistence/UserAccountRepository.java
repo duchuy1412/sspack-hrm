@@ -1,5 +1,6 @@
 package vn.sspack.hrm.platform.infrastructure.persistence;
 
+import java.util.List;
 import java.util.Optional;
 
 import jakarta.persistence.LockModeType;
@@ -12,6 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import vn.sspack.hrm.platform.domain.auth.UserAccount;
+import vn.sspack.hrm.shared.security.DataScope;
 
 public interface UserAccountRepository extends JpaRepository<UserAccount, Long> {
 
@@ -38,4 +40,8 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, Long> 
     @EntityGraph(attributePaths = {"roles", "roles.permissions"})
     @Query("select u from UserAccount u where u.id = :id")
     Optional<UserAccount> findWithRolesById(@Param("id") Long id);
+
+    /** Phạm vi dữ liệu của mọi vai trò gán cho tài khoản (đọc thẳng từ CSDL, không chờ token làm mới). */
+    @Query("select r.dataScope from UserAccount u join u.roles r where u.id = :userId and u.companyId = :companyId")
+    List<DataScope> findDataScopes(@Param("userId") Long userId, @Param("companyId") Long companyId);
 }

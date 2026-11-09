@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import vn.sspack.hrm.shared.error.ApiException;
+import vn.sspack.hrm.shared.security.DataScope;
 
 /** PLT-03: quy tắc nghiệp vụ của vai trò và gán vai trò cho tài khoản. */
 class RoleRulesTest {

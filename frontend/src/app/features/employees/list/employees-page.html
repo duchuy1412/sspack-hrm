@@ -1,0 +1,141 @@
+<header class="page-header">
+  <div class="titles">
+    <h1 class="display">{{ 'employees.title' | transloco }}</h1>
+    <p class="muted" aria-live="polite">
+      @if (!loading()) {
+        {{ 'employees.list.count' | transloco: { count: total() } }}
+      }
+    </p>
+  </div>
+  @if (canManage()) {
+    <a class="btn btn-primary" routerLink="new">{{ 'employees.list.add' | transloco }}</a>
+  }
+</header>
+
+<form class="filters" role="search" (submit)="$event.preventDefault()">
+  <div class="field search">
+    <label class="field-label" for="employee-search">{{
+      'employees.list.search' | transloco
+    }}</label>
+    <input
+      id="employee-search"
+      type="search"
+      [ngModel]="query()"
+      (ngModelChange)="onQuery($event)"
+      name="q"
+      [placeholder]="'employees.list.searchPlaceholder' | transloco"
+    />
+  </div>
+  <div class="field">
+    <label class="field-label" for="employee-department">{{
+      'employees.list.department' | transloco
+    }}</label>
+    <select
+      id="employee-department"
+      name="department"
+      [ngModel]="departmentFilter()"
+      (ngModelChange)="onDepartment($event)"
+    >
+      <option value="">{{ 'employees.list.allDepartments' | transloco }}</option>
+      @for (d of departments(); track d.id) {
+        <option [value]="d.id">{{ d.label }}</option>
+      }
+    </select>
+  </div>
+  <div class="field">
+    <label class="field-label" for="employee-status">{{
+      'employees.list.status' | transloco
+    }}</label>
+    <select
+      id="employee-status"
+      name="status"
+      [ngModel]="statusFilter()"
+      (ngModelChange)="onStatus($event)"
+    >
+      @for (key of statusFilters; track key) {
+        <option [value]="key">{{ 'employees.statusFilters.' + key | transloco }}</option>
+      }
+    </select>
+  </div>
+</form>
+
+@if (error(); as message) {
+  <p class="alert" role="alert">{{ message }}</p>
+}
+
+<section class="card" [attr.aria-busy]="loading()">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">{{ 'employees.columns.code' | transloco }}</th>
+          <th scope="col">{{ 'employees.columns.name' | transloco }}</th>
+          <th scope="col">{{ 'employees.columns.department' | transloco }}</th>
+          <th scope="col">{{ 'employees.columns.position' | transloco }}</th>
+          <th scope="col">{{ 'employees.columns.hireDate' | transloco }}</th>
+          <th scope="col">{{ 'employees.columns.status' | transloco }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (e of rows(); track e.id) {
+          <tr [attr.data-id]="e.id">
+            <td class="code">{{ e.code }}</td>
+            <td class="person">
+              <div class="person-cell">
+                <span class="avatar" aria-hidden="true">{{ initials(e.fullName) }}</span>
+                <span class="person-text">
+                  <a class="person-name" [routerLink]="[e.id]">{{ e.fullName }}</a>
+                  @if (e.workEmail) {
+                    <span class="muted">{{ e.workEmail }}</span>
+                  }
+                </span>
+              </div>
+            </td>
+            <td>{{ e.departmentName }}</td>
+            <td>{{ e.positionName }}</td>
+            <td class="date">{{ formatDate(e.hireDate) }}</td>
+            <td>
+              <span class="chip status" [attr.data-status]="e.status">
+                {{ 'employees.statuses.' + e.status | transloco }}
+              </span>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6" class="muted">
+              {{ (loading() ? 'admin.loading' : 'employees.list.empty') | transloco }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  @if (totalPages() > 1 || total() > 0) {
+    <footer class="pager">
+      <span class="muted">{{ 'employees.list.range' | transloco: range() }}</span>
+      @if (totalPages() > 1) {
+        <nav class="pager-buttons" [attr.aria-label]="'employees.list.pagination' | transloco">
+          <button
+            type="button"
+            class="btn"
+            [disabled]="page() === 0 || loading()"
+            (click)="goTo(page() - 1)"
+          >
+            {{ 'employees.list.previous' | transloco }}
+          </button>
+          <span class="muted page-of">{{
+            'employees.list.pageOf' | transloco: { page: page() + 1, pages: totalPages() }
+          }}</span>
+          <button
+            type="button"
+            class="btn"
+            [disabled]="page() >= totalPages() - 1 || loading()"
+            (click)="goTo(page() + 1)"
+          >
+            {{ 'employees.list.next' | transloco }}
+          </button>
+        </nav>
+      }
+    </footer>
+  }
+</section>

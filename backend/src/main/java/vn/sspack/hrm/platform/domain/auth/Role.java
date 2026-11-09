@@ -24,6 +24,8 @@ import jakarta.persistence.Version;
 
 import org.hibernate.annotations.BatchSize;
 
+import vn.sspack.hrm.shared.security.DataScope;
+
 /**
  * Vai trò: tập quyền theo chức năng cộng với phạm vi dữ liệu (PLT-03).
  *

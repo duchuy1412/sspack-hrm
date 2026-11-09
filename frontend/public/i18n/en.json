@@ -247,7 +247,8 @@
     "refresh_tokens": "Sessions",
     "departments": "Departments",
     "job_grades": "Job grades",
-    "positions": "Positions"
+    "positions": "Positions",
+    "employees": "Employees"
   },
   "org": {
     "title": "Organization",
@@ -436,6 +437,119 @@
       "POSITION_GRADE_INACTIVE": "The job grade is inactive. Choose another grade or reactivate it.",
       "POSITION_HAS_EMPLOYEES": "This position has {{employeeCount}} employees and cannot be deleted. Deactivate it instead.",
       "POSITION_IN_USE": "This position is used elsewhere and cannot be deleted. Deactivate it instead."
+    }
+  },
+  "employees": {
+    "title": "Employees",
+    "list": {
+      "count": "{{count}} employees match the filters",
+      "add": "Add employee",
+      "search": "Search",
+      "searchPlaceholder": "Name, employee code, email",
+      "department": "Department",
+      "allDepartments": "All departments",
+      "status": "Status",
+      "empty": "No employees match the filters.",
+      "range": "Showing {{from}}–{{to}} of {{total}} employees",
+      "pagination": "Pagination",
+      "previous": "Previous",
+      "next": "Next",
+      "pageOf": "Page {{page}} of {{pages}}"
+    },
+    "columns": {
+      "code": "Code",
+      "name": "Full name",
+      "department": "Department",
+      "position": "Position",
+      "hireDate": "Hire date",
+      "status": "Status"
+    },
+    "statusFilters": {
+      "working": "Currently employed",
+      "PROBATION": "Probation",
+      "ACTIVE": "Permanent",
+      "ON_LEAVE": "Extended leave",
+      "left": "Left the company",
+      "all": "All"
+    },
+    "statuses": {
+      "PROBATION": "Probation",
+      "ACTIVE": "Permanent",
+      "ON_LEAVE": "Extended leave",
+      "RESIGNED": "Resigned",
+      "TERMINATED": "Terminated"
+    },
+    "genders": {
+      "MALE": "Male",
+      "FEMALE": "Female",
+      "OTHER": "Other"
+    },
+    "groups": {
+      "work": "Employment",
+      "personal": "Personal information",
+      "contact": "Contact",
+      "personalContact": "Personal and contact"
+    },
+    "fields": {
+      "code": "Employee code",
+      "fullName": "Full name",
+      "gender": "Gender",
+      "dateOfBirth": "Date of birth",
+      "workEmail": "Work email",
+      "personalEmail": "Personal email",
+      "phone": "Phone",
+      "address": "Address",
+      "department": "Department",
+      "position": "Position",
+      "hireDate": "Hire date",
+      "status": "Status"
+    },
+    "hints": {
+      "code": "Next suggested code; you can change it. Uppercase letters, digits, underscore or hyphen.",
+      "statusCreate": "A new profile starts on probation or as permanent.",
+      "statusUpdate": "Leaving the company is handled in the offboarding feature, not here."
+    },
+    "profile": {
+      "back": "← Employee list",
+      "createTitle": "Add employee",
+      "chooseDepartment": "Choose a department",
+      "choosePosition": "Choose a position",
+      "notSpecified": "Not specified",
+      "discard": "Discard changes",
+      "created": "Added employee {{name}}.",
+      "updated": "Saved {{name}}'s profile.",
+      "personalHidden": "Date of birth, personal email, phone and address are visible only to HR and the employee."
+    },
+    "validation": {
+      "codeRequired": "Enter the employee code",
+      "codePattern": "2–30 characters: letters, digits, underscore or hyphen",
+      "fullNameRequired": "Enter the full name",
+      "fullNameTooLong": "Full name is at most 150 characters",
+      "emailInvalid": "Invalid email address",
+      "workEmailTooLong": "Email is at most 255 characters",
+      "personalEmailTooLong": "Email is at most 255 characters",
+      "phonePattern": "Phone number has 9–15 digits and may start with +",
+      "addressTooLong": "Address is at most 500 characters",
+      "departmentIdRequired": "Choose a department",
+      "positionIdRequired": "Choose a position",
+      "hireDateRequired": "Enter the hire date",
+      "statusRequired": "Choose a status",
+      "birthDate": "Date of birth must be before the hire date and not in the future"
+    },
+    "errors": {
+      "EMPLOYEE_NOT_FOUND": "Employee not found, or the profile is outside your data scope.",
+      "EMPLOYEE_CODE_EXISTS": "The employee code already exists.",
+      "EMPLOYEE_CODE_INVALID": "Employee code: 2–30 uppercase letters, digits, underscore or hyphen.",
+      "EMPLOYEE_NAME_REQUIRED": "Enter the full name (at most 150 characters).",
+      "EMPLOYEE_WORK_EMAIL_EXISTS": "The work email is already used by another employee.",
+      "EMPLOYEE_BIRTH_DATE_INVALID": "Date of birth must be before the hire date and not in the future.",
+      "EMPLOYEE_PHONE_INVALID": "Phone number has 9–15 digits and may start with +.",
+      "EMPLOYEE_STATUS_NOT_ALLOWED": "This status cannot be chosen. Leaving is handled in the offboarding feature.",
+      "EMPLOYEE_DEPARTMENT_NOT_FOUND": "Department not found.",
+      "EMPLOYEE_POSITION_NOT_FOUND": "Position not found.",
+      "EMPLOYEE_DEPARTMENT_INACTIVE": "The department is inactive. Choose another department.",
+      "EMPLOYEE_POSITION_INACTIVE": "The position is inactive. Choose another position.",
+      "EMPLOYEE_OUT_OF_SCOPE": "The department is outside the data scope you manage."
     }
   }
 }
