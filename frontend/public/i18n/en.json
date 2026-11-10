@@ -254,6 +254,7 @@
     "title": "Organization",
     "tabs": {
       "departments": "Departments",
+      "chart": "Chart",
       "positions": "Positions",
       "jobGrades": "Job grades"
     },
@@ -437,6 +438,23 @@
       "POSITION_GRADE_INACTIVE": "The job grade is inactive. Choose another grade or reactivate it.",
       "POSITION_HAS_EMPLOYEES": "This position has {{employeeCount}} employees and cannot be deleted. Deactivate it instead.",
       "POSITION_IN_USE": "This position is used elsewhere and cannot be deleted. Deactivate it instead."
+    },
+    "chart": {
+      "search": "Find an employee on the chart",
+      "searchPlaceholder": "Name or employee code",
+      "total": "{{count}} current employees",
+      "matchOf": "Result {{current}} of {{count}}",
+      "noMatch": "No employees match.",
+      "previousMatch": "Previous result",
+      "nextMatch": "Next result",
+      "expandAll": "Expand all",
+      "collapseAll": "Collapse all",
+      "expand": "Expand {{name}}",
+      "collapse": "Collapse {{name}}",
+      "people": "{{count}} people",
+      "you": "You",
+      "showMore": "Show {{count}} more",
+      "empty": "No active departments yet."
     }
   },
   "employees": {

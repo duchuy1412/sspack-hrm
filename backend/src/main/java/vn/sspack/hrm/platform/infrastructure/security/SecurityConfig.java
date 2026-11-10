@@ -82,6 +82,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/positions", "/api/v1/positions/**").hasAuthority("org:manage")
                         // Khung lương là dữ liệu nhạy cảm: xem cũng cần org:manage
                         .requestMatchers("/api/v1/job-grades", "/api/v1/job-grades/**").hasAuthority("org:manage")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/org-chart").hasAuthority("org:read")
                         .requestMatchers(HttpMethod.GET, "/api/v1/employees/next-code").hasAuthority("employee:manage")
                         .requestMatchers(HttpMethod.GET, "/api/v1/employees", "/api/v1/employees/**")
                         .hasAuthority("employee:read")

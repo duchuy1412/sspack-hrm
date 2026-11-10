@@ -3,7 +3,7 @@ import { Routes } from '@angular/router';
 import { requireAnyPermission } from '../../core/auth/permission.guard';
 
 /**
- * Phân hệ Cơ cấu tổ chức, lazy-load từ app.routes.ts. ORG-01: cây phòng ban; ORG-02: chức danh và cấp bậc
+ * Phân hệ Cơ cấu tổ chức, lazy-load từ app.routes.ts. ORG-01: cây phòng ban; ORG-03: sơ đồ tổ chức; ORG-02: chức danh và cấp bậc
  * (khung lương chỉ dành cho người có `org:manage`).
  */
 export default [
@@ -16,6 +16,10 @@ export default [
         path: 'departments',
         loadComponent: () =>
           import('./departments/departments-page').then((m) => m.DepartmentsPage),
+      },
+      {
+        path: 'chart',
+        loadComponent: () => import('./chart/org-chart-page').then((m) => m.OrgChartPage),
       },
       {
         path: 'positions',

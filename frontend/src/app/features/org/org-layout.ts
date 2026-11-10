@@ -5,8 +5,8 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { HasPermissionDirective } from '../../core/auth/has-permission.directive';
 
 /**
- * Khung phân hệ Cơ cấu tổ chức: tiêu đề và tab. Phòng ban, chức danh mọi người xem được; cấp bậc (khung lương)
- * chỉ hiện với người có `org:manage`.
+ * Khung phân hệ Cơ cấu tổ chức: tiêu đề và tab. Phòng ban, sơ đồ, chức danh mọi người xem được; cấp bậc
+ * (khung lương) chỉ hiện với người có `org:manage`.
  */
 @Component({
   selector: 'hrm-org-layout',
@@ -15,12 +15,23 @@ import { HasPermissionDirective } from '../../core/auth/has-permission.directive
   template: `
     <h1 class="display">{{ 'org.title' | transloco }}</h1>
     <nav class="tabs" [attr.aria-label]="'org.title' | transloco">
-      <a class="tab" routerLink="departments" routerLinkActive="active" ariaCurrentWhenActive="page">{{
-        'org.tabs.departments' | transloco
+      <a
+        class="tab"
+        routerLink="departments"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+        >{{ 'org.tabs.departments' | transloco }}</a
+      >
+      <a class="tab" routerLink="chart" routerLinkActive="active" ariaCurrentWhenActive="page">{{
+        'org.tabs.chart' | transloco
       }}</a>
-      <a class="tab" routerLink="positions" routerLinkActive="active" ariaCurrentWhenActive="page">{{
-        'org.tabs.positions' | transloco
-      }}</a>
+      <a
+        class="tab"
+        routerLink="positions"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+        >{{ 'org.tabs.positions' | transloco }}</a
+      >
       <a
         *hrmHasPermission="'org:manage'"
         class="tab"

@@ -14,6 +14,7 @@ import { Observable, startWith } from 'rxjs';
 
 import { AuthService } from '../../../core/auth/auth.service';
 import { formatVndRange } from '../../../shared/format/money';
+import { normalizeSearch } from '../../../shared/format/search';
 import { RbacErrorMessages } from '../../admin/rbac.api';
 import { JobGrade, OrgCatalogApi, Position } from '../org-catalog.api';
 
@@ -27,16 +28,8 @@ export interface GradeOption {
   active: boolean;
 }
 
-/** Tìm không phân biệt hoa thường và dấu tiếng Việt: "ky su" khớp "Kỹ sư". */
-export function normalizeSearch(text: string): string {
-  return text
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .replace(/đ/g, 'd')
-    .replace(/Đ/g, 'D')
-    .toLowerCase()
-    .trim();
-}
+/** Giữ export cũ cho nơi đang dùng; hàm nằm ở shared/format/search.ts. */
+export { normalizeSearch };
 
 /**
  * ORG-02: danh mục chức danh, mỗi chức danh gắn với một khung cấp bậc lương. Mọi người dùng xem được danh sách;
@@ -258,9 +251,7 @@ export class PositionsPage {
   protected setActive(position: Position, active: boolean): void {
     if (
       !active &&
-      !confirm(
-        this.transloco.translate('org.positions.confirmDeactivate', { name: position.name }),
-      )
+      !confirm(this.transloco.translate('org.positions.confirmDeactivate', { name: position.name }))
     ) {
       return;
     }

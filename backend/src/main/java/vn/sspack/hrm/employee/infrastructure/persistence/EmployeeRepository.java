@@ -1,5 +1,7 @@
 package vn.sspack.hrm.employee.infrastructure.persistence;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,12 +10,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import vn.sspack.hrm.employee.domain.Employee;
+import vn.sspack.hrm.employee.domain.EmployeeStatus;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSpecificationExecutor<Employee> {
 
     Optional<Employee> findByIdAndCompanyId(Long id, Long companyId);
 
     Optional<Employee> findByCompanyIdAndUserId(Long companyId, Long userId);
+
+    List<Employee> findByCompanyIdAndStatusIn(Long companyId, Collection<EmployeeStatus> statuses);
 
     boolean existsByCompanyIdAndCode(Long companyId, String code);
 
