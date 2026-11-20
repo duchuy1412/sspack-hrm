@@ -272,6 +272,141 @@ class DepartmentIT {
         assertThat(move).isEqualTo(">" + target);
     }
 
+
+    // ================================================================= ORG-04: trưởng đơn vị
+
+    @Test
+    @DisplayName("HR chỉ định rồi bỏ trưởng: version tăng, audit UPDATE có headEmployeeId trước/sau")
+    void hrAssignsAndClearsHead() throws Exception {
+        long dept = create(prefix + "-H", null);
+        long emp = insertEmployee(dept, "ACTIVE");
+        int v0 = version(dept);
+
+        putHead(dept, emp, v0)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.head.employeeId").value(emp))
+                .andExpect(jsonPath("$.head.warnings[0]").value("NO_ACCOUNT"))
+                .andExpect(jsonPath("$.version").value(v0 + 1));
+
+        Long before = jdbc.sql("""
+                        SELECT (old_value ->> 'headEmployeeId')::bigint FROM hrm.audit_logs
+                        WHERE entity_type = 'departments' AND entity_id = :id AND action = 'UPDATE'
+                        """).param("id", dept).query(Long.class).optional().orElse(null);
+        assertThat(before).isNull();
+        assertThat(auditUpdates(dept)).isEqualTo(1);
+
+        putHead(dept, null, version(dept))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.head").doesNotExist());
+        assertThat(auditUpdates(dept)).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("Nhân viên (EMPLOYEE) không chỉ định được trưởng: 403")
+    void employeeCannotAssignHead() throws Exception {
+        String employeeToken = login(testUsers.create("EMPLOYEE").email());
+        long dept = create(prefix + "-H", null);
+        mvc.perform(put("/api/v1/departments/" + dept + "/head").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"employeeId\": null, \"version\": 0}")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + employeeToken))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("Nhân viên đã nghỉ việc: 422 DEPARTMENT_HEAD_NOT_WORKING")
+    void rejectsResignedEmployee() throws Exception {
+        long dept = create(prefix + "-H", null);
+        long emp = insertEmployee(dept, "RESIGNED");
+        putHead(dept, emp, version(dept))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.code").value("DEPARTMENT_HEAD_NOT_WORKING"));
+    }
+
+    @Test
+    @DisplayName("Nhân viên của công ty khác: 422 DEPARTMENT_HEAD_NOT_WORKING")
+    void rejectsEmployeeOfAnotherCompany() throws Exception {
+        long dept = create(prefix + "-H", null);
+        long foreign = insertForeignEmployee();
+        putHead(dept, foreign, version(dept))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.code").value("DEPARTMENT_HEAD_NOT_WORKING"));
+        putHead(dept, 999_999_999L, version(dept))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.code").value("DEPARTMENT_HEAD_NOT_WORKING"));
+    }
+
+    @Test
+    @DisplayName("Phòng ban ngừng hoạt động: 409 DEPARTMENT_HEAD_INACTIVE")
+    void rejectsOnInactiveDepartment() throws Exception {
+        long dept = create(prefix + "-H", null);
+        long emp = insertEmployee(create(prefix + "-X", null), "ACTIVE");
+        authed(put("/api/v1/departments/" + dept + "/status").contentType(MediaType.APPLICATION_JSON).content("""
+                {"active": false, "version": %d}
+                """.formatted(version(dept)))).andExpect(status().isOk());
+        putHead(dept, emp, version(dept))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("DEPARTMENT_HEAD_INACTIVE"));
+    }
+
+    @Test
+    @DisplayName("Chỉ định bằng version cũ: 409 CONCURRENT_MODIFICATION")
+    void staleVersionConflicts() throws Exception {
+        long dept = create(prefix + "-H", null);
+        long emp = insertEmployee(dept, "ACTIVE");
+        int v = version(dept);
+        putHead(dept, emp, v).andExpect(status().isOk());
+        putHead(dept, null, v)
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("CONCURRENT_MODIFICATION"));
+    }
+
+    @Test
+    @DisplayName("Chỉ định lại đúng người đang là trưởng: không đổi version, không thêm audit")
+    void sameHeadIsNoOp() throws Exception {
+        long dept = create(prefix + "-H", null);
+        long emp = insertEmployee(dept, "ACTIVE");
+        putHead(dept, emp, version(dept)).andExpect(status().isOk());
+        int v = version(dept);
+
+        putHead(dept, emp, v)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.version").value(v));
+        assertThat(version(dept)).isEqualTo(v);
+        assertThat(auditUpdates(dept)).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("Cây: cảnh báo NO_ACCOUNT / NO_MANAGER_SCOPE và người duyệt hiệu lực lấy từ phòng ban cha")
+    void listShowsWarningsAndEffectiveApprover() throws Exception {
+        long parent = create(prefix + "-P", null);
+        long child = create(prefix + "-C", parent);
+        long noAccount = insertEmployee(parent, "ACTIVE");
+        long plain = insertEmployee(child, "ACTIVE");
+        jdbc.sql("UPDATE hrm.employees SET user_id = :u WHERE id = :id")
+                .param("u", testUsers.create("EMPLOYEE").id()).param("id", plain).update();
+        long manager = insertEmployee(child, "ACTIVE");
+        jdbc.sql("UPDATE hrm.employees SET user_id = :u WHERE id = :id")
+                .param("u", testUsers.create("MANAGER").id()).param("id", manager).update();
+
+        putHead(parent, noAccount, version(parent)).andExpect(status().isOk());
+        String body = authed(get("/api/v1/departments")).andReturn().getResponse().getContentAsString();
+        assertThat(JsonPath.<List<String>>read(body, "$[?(@.id == " + parent + ")].head.warnings[0]"))
+                .containsExactly("NO_ACCOUNT");
+        // phòng con chưa có trưởng: người duyệt là trưởng phòng cha
+        assertThat(JsonPath.<List<Integer>>read(body, "$[?(@.id == " + child + ")].effectiveApprover.employeeId"))
+                .containsExactly((int) noAccount);
+        assertThat(JsonPath.<List<Object>>read(body, "$[?(@.id == " + child + ")].head")).containsOnlyNulls();
+
+        putHead(child, plain, version(child))
+                .andExpect(jsonPath("$.head.warnings[0]").value("NO_MANAGER_SCOPE"));
+        putHead(child, manager, version(child))
+                .andExpect(jsonPath("$.head.warnings").isEmpty())
+                .andExpect(jsonPath("$.effectiveApprover.employeeId").value(manager))
+                .andExpect(jsonPath("$.effectiveApprover.warnings").isEmpty());
+        authed(get("/api/v1/departments/" + child))
+                .andExpect(jsonPath("$.head.employeeId").value(manager));
+    }
+
     // ================================================================= tiện ích
 
     private ResultActions authed(MockHttpServletRequestBuilder request) throws Exception {
@@ -297,16 +432,44 @@ class DepartmentIT {
                 .query(String.class).single();
     }
 
-    private void insertEmployee(long departmentId, String status) {
-        jdbc.sql("""
+    private long insertEmployee(long departmentId, String status) {
+        return jdbc.sql("""
                         INSERT INTO hrm.employees (company_id, employee_code, full_name, department_id, hire_date, status)
                         SELECT company_id, :code, 'Nhân viên thử', id, DATE '2025-01-02', :status
                         FROM hrm.departments WHERE id = :departmentId
+                        RETURNING id
                         """)
                 .param("code", "E" + UUID.randomUUID().toString().substring(0, 8))
                 .param("departmentId", departmentId)
                 .param("status", status)
-                .update();
+                .query(Long.class).single();
+    }
+
+    private ResultActions putHead(long deptId, Long employeeId, int version) throws Exception {
+        return authed(put("/api/v1/departments/" + deptId + "/head").contentType(MediaType.APPLICATION_JSON)
+                .content("{\"employeeId\": %s, \"version\": %d}".formatted(employeeId, version)));
+    }
+
+    private int auditUpdates(long deptId) {
+        return jdbc.sql("""
+                        SELECT count(*) FROM hrm.audit_logs
+                        WHERE entity_type = 'departments' AND entity_id = :id AND action = 'UPDATE'
+                        """).param("id", deptId).query(Integer.class).single();
+    }
+
+    private long insertForeignEmployee() {
+        String code = "OTH" + UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
+        long company = jdbc.sql("INSERT INTO hrm.companies (code, name) VALUES (:c, 'Công ty khác') RETURNING id")
+                .param("c", code).query(Long.class).single();
+        long dept = jdbc.sql("""
+                        INSERT INTO hrm.departments (company_id, code, name, path)
+                        VALUES (:company, :c, 'Phòng khác', '/0/') RETURNING id
+                        """).param("company", company).param("c", code).query(Long.class).single();
+        return jdbc.sql("""
+                        INSERT INTO hrm.employees (company_id, employee_code, full_name, department_id, hire_date, status)
+                        VALUES (:company, :c, 'Người công ty khác', :dept, DATE '2025-01-02', 'ACTIVE') RETURNING id
+                        """).param("company", company).param("c", code).param("dept", dept)
+                .query(Long.class).single();
     }
 
     private String login(String email) throws Exception {

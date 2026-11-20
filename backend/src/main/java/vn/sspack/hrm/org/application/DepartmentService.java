@@ -2,11 +2,14 @@ package vn.sspack.hrm.org.application;
 
 import java.time.Clock;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -15,13 +18,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 import vn.sspack.hrm.employee.application.EmployeeHeadcountService;
 import vn.sspack.hrm.employee.application.EmployeeHeadcountService.Headcount;
+import vn.sspack.hrm.employee.application.EmployeeRefService;
+import vn.sspack.hrm.employee.application.EmployeeRefService.EmployeeRef;
 import vn.sspack.hrm.org.domain.Department;
+import vn.sspack.hrm.org.domain.DepartmentRuleException;
 import vn.sspack.hrm.org.infrastructure.persistence.DepartmentRepository;
 import vn.sspack.hrm.platform.application.audit.AuditEntity;
 import vn.sspack.hrm.platform.application.audit.AuditLogService;
 import vn.sspack.hrm.platform.application.audit.AuditLogService.Action;
+import vn.sspack.hrm.platform.application.rbac.DataScopeService;
 import vn.sspack.hrm.shared.api.RequestActor;
 import vn.sspack.hrm.shared.error.ApiException;
+import vn.sspack.hrm.shared.security.DataScope;
 
 /**
  * ORG-01: HR tạo cây phòng ban nhiều cấp, đổi cấp cha, ngừng hoạt động, xóa phòng ban chưa dùng.
@@ -32,20 +40,34 @@ public class DepartmentService {
 
     private final DepartmentRepository departments;
     private final EmployeeHeadcountService headcounts;
+    private final EmployeeRefService employeeRefs;
+    private final DepartmentHeadResolver headResolver;
+    private final DataScopeService dataScopes;
     private final AuditLogService audit;
     private final Clock clock;
 
     public DepartmentService(DepartmentRepository departments, EmployeeHeadcountService headcounts,
-                             AuditLogService audit, Clock clock) {
+                             EmployeeRefService employeeRefs, DepartmentHeadResolver headResolver,
+                             DataScopeService dataScopes, AuditLogService audit, Clock clock) {
         this.departments = departments;
         this.headcounts = headcounts;
+        this.employeeRefs = employeeRefs;
+        this.headResolver = headResolver;
+        this.dataScopes = dataScopes;
         this.audit = audit;
         this.clock = clock;
     }
 
     public record DepartmentView(Long id, Long parentId, String code, String name, String path, int depth,
                                  boolean active, int childCount, long employeeCount, long workingEmployeeCount,
-                                 int version, OffsetDateTime updatedAt) {
+                                 int version, OffsetDateTime updatedAt, PersonRef head, PersonRef effectiveApprover) {
+    }
+
+    /** Người được nhắc tới trên cây; {@code warnings} chỉ có giá trị với trưởng đơn vị (NO_ACCOUNT, NO_MANAGER_SCOPE). */
+    public record PersonRef(Long employeeId, String code, String fullName, List<String> warnings) {
+    }
+
+    public record HeadCommand(Long employeeId, int version) {
     }
 
     public record CreateCommand(String code, String name, Long parentId) {
@@ -65,20 +87,18 @@ public class DepartmentService {
     /** Mọi phòng ban theo thứ tự cây (cha trước con); ngừng hoạt động chỉ có khi {@code includeInactive}. */
     @Transactional(readOnly = true)
     public List<DepartmentView> list(long companyId, boolean includeInactive) {
-        List<Department> all = includeInactive
-                ? departments.findByCompanyIdOrderByPathAsc(companyId)
-                : departments.findByCompanyIdAndActiveTrueOrderByPathAsc(companyId);
+        // Người duyệt hiệu lực tính trên toàn bộ phòng ban: cấp trên có thể đã ngừng hoạt động
+        List<Department> company = departments.findByCompanyIdOrderByPathAsc(companyId);
+        List<Department> shown = includeInactive ? company : company.stream().filter(Department::isActive).toList();
         Map<Long, Integer> children = new HashMap<>();
-        all.forEach(d -> {
+        shown.forEach(d -> {
             if (d.getParentId() != null) {
                 children.merge(d.getParentId(), 1, Integer::sum);
             }
         });
         Map<Long, Headcount> counts = headcounts.countByDepartment(companyId,
-                all.stream().map(Department::getId).toList());
-        return all.stream()
-                .map(d -> toView(d, children.getOrDefault(d.getId(), 0), counts.get(d.getId())))
-                .toList();
+                shown.stream().map(Department::getId).toList());
+        return toViews(companyId, company, shown, children, counts);
     }
 
     @Transactional(readOnly = true)
@@ -178,6 +198,29 @@ public class DepartmentService {
         return view(department);
     }
 
+    /** Chỉ định hoặc bỏ (null) trưởng đơn vị. Chỉ nhân viên đang làm việc của công ty mới được chọn. */
+    @Transactional
+    public DepartmentView assignHead(RequestActor actor, long id, HeadCommand command) {
+        Department department = departments.findForUpdate(id, actor.companyId())
+                .orElseThrow(DepartmentService::notFound);
+        checkVersion(department, command.version());
+        Long employeeId = command.employeeId();
+        if (employeeId != null) {
+            EmployeeRef ref = employeeRefs.refs(actor.companyId(), List.of(employeeId)).get(employeeId);
+            if (ref == null || !ref.working()) {
+                throw DepartmentRuleException.headNotWorking();
+            }
+        }
+        Map<String, Object> before = snapshot(department);
+        if (!department.assignHead(employeeId, now())) {
+            return view(department);
+        }
+        departments.flush();
+        audit.record(actor.companyId(), actor.userId(), Action.UPDATE, AuditEntity.DEPARTMENTS, id, before,
+                snapshot(department), actor.ipAddress());
+        return view(department);
+    }
+
     @Transactional
     public void delete(RequestActor actor, long id) {
         Department department = load(actor.companyId(), id);
@@ -207,13 +250,52 @@ public class DepartmentService {
     }
 
     private DepartmentView view(Department department) {
-        return toView(department, (int) departments.countByParentId(department.getId()), headcount(department));
+        long companyId = department.getCompanyId();
+        return toViews(companyId, departments.findByCompanyIdOrderByPathAsc(companyId), List.of(department),
+                Map.of(department.getId(), (int) departments.countByParentId(department.getId())),
+                Map.of(department.getId(), headcount(department))).get(0);
     }
 
-    private static DepartmentView toView(Department d, int childCount, Headcount count) {
-        Headcount c = count == null ? Headcount.NONE : count;
-        return new DepartmentView(d.getId(), d.getParentId(), d.getCode(), d.getName(), d.getPath(), d.depth(),
-                d.isActive(), childCount, c.total(), c.working(), d.getVersion(), d.getUpdatedAt());
+    /**
+     * Dựng view cho {@code shown} (một phần của {@code company}); trưởng và người duyệt hiệu lực tra bằng một lần
+     * đọc nhân viên, quyền của tài khoản trưởng tra một lần cho mỗi tài khoản.
+     */
+    private List<DepartmentView> toViews(long companyId, List<Department> company, List<Department> shown,
+                                         Map<Long, Integer> children, Map<Long, Headcount> counts) {
+        Map<Long, Optional<Long>> approvers = headResolver.effectiveApprovers(companyId, company);
+        Set<Long> ids = new HashSet<>();
+        for (Department d : shown) {
+            if (d.getHeadEmployeeId() != null) {
+                ids.add(d.getHeadEmployeeId());
+            }
+            approvers.getOrDefault(d.getId(), Optional.empty()).ifPresent(ids::add);
+        }
+        Map<Long, EmployeeRef> refs = employeeRefs.refs(companyId, ids);
+        Map<Long, Optional<DataScope>> scopes = new HashMap<>();
+        List<DepartmentView> views = new ArrayList<>(shown.size());
+        for (Department d : shown) {
+            EmployeeRef head = d.getHeadEmployeeId() == null ? null : refs.get(d.getHeadEmployeeId());
+            PersonRef headRef = head == null ? null
+                    : new PersonRef(head.id(), head.code(), head.fullName(), warnings(companyId, head, scopes));
+            EmployeeRef approver = approvers.getOrDefault(d.getId(), Optional.empty()).map(refs::get).orElse(null);
+            PersonRef approverRef = approver == null ? null
+                    : new PersonRef(approver.id(), approver.code(), approver.fullName(), List.of());
+            Headcount c = counts.get(d.getId()) == null ? Headcount.NONE : counts.get(d.getId());
+            views.add(new DepartmentView(d.getId(), d.getParentId(), d.getCode(), d.getName(), d.getPath(),
+                    d.depth(), d.isActive(), children.getOrDefault(d.getId(), 0), c.total(), c.working(),
+                    d.getVersion(), d.getUpdatedAt(), headRef, approverRef));
+        }
+        return views;
+    }
+
+    private List<String> warnings(long companyId, EmployeeRef head, Map<Long, Optional<DataScope>> scopes) {
+        if (head.userId() == null) {
+            return List.of("NO_ACCOUNT");
+        }
+        Optional<DataScope> scope = scopes.computeIfAbsent(head.userId(),
+                userId -> dataScopes.widestScope(companyId, userId));
+        boolean manager = scope.filter(s -> s == DataScope.DEPARTMENT_TREE || s == DataScope.ALL).isPresent();
+        return manager ? List.of() : List.of("NO_MANAGER_SCOPE");
     }
 
     private static void checkVersion(Department department, int version) {
@@ -230,6 +312,7 @@ public class DepartmentService {
         value.put("parentId", d.getParentId());
         value.put("path", d.getPath());
         value.put("active", d.isActive());
+        value.put("headEmployeeId", d.getHeadEmployeeId());
         return value;
     }
 

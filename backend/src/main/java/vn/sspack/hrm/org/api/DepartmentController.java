@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import vn.sspack.hrm.org.api.DepartmentDtos.CreateDepartmentRequest;
 import vn.sspack.hrm.org.api.DepartmentDtos.DepartmentResponse;
 import vn.sspack.hrm.org.api.DepartmentDtos.DepartmentStatusRequest;
+import vn.sspack.hrm.org.api.DepartmentDtos.HeadRequest;
 import vn.sspack.hrm.org.api.DepartmentDtos.MoveDepartmentRequest;
 import vn.sspack.hrm.org.api.DepartmentDtos.UpdateDepartmentRequest;
 import vn.sspack.hrm.org.application.DepartmentService;
@@ -93,6 +94,16 @@ public class DepartmentController {
                                            @PathVariable long id,
                                            @Valid @RequestBody DepartmentStatusRequest request) {
         return mapper.toResponse(service.changeStatus(RequestActor.of(jwt, http), id, mapper.toCommand(request)));
+    }
+
+    @Operation(summary = "Chỉ định hoặc bỏ trưởng đơn vị",
+            description = "Chỉ nhân viên đang làm việc của công ty; employeeId = null để bỏ trưởng. "
+                    + "Chỉ định lại đúng người hiện tại không thay đổi gì.")
+    @PreAuthorize("hasAuthority('org:manage')")
+    @PutMapping("/{id}/head")
+    public DepartmentResponse assignHead(@AuthenticationPrincipal Jwt jwt, HttpServletRequest http,
+                                         @PathVariable long id, @Valid @RequestBody HeadRequest request) {
+        return mapper.toResponse(service.assignHead(RequestActor.of(jwt, http), id, mapper.toCommand(request)));
     }
 
     @Operation(summary = "Xóa phòng ban",
