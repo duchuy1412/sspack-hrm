@@ -20,6 +20,9 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
 
     List<Department> findByCompanyIdAndActiveTrueOrderByPathAsc(Long companyId);
 
+    /** Phòng ban (kể cả đã ngừng hoạt động) do nhân viên này làm trưởng. */
+    List<Department> findByCompanyIdAndHeadEmployeeId(Long companyId, Long headEmployeeId);
+
     Optional<Department> findByIdAndCompanyId(Long id, Long companyId);
 
     /**

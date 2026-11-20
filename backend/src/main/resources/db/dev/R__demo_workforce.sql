@@ -63,3 +63,25 @@ WHERE u.company_id = e.company_id
   AND lower(u.email) = lower(e.work_email)
   AND e.user_id IS NULL
   AND NOT EXISTS (SELECT 1 FROM employees x WHERE x.user_id = u.id);
+
+-- Trưởng đơn vị mẫu (ORG-04): gán trưởng cho các phòng ban có người đứng đầu.
+-- Chạy lại an toàn: chỉ cập nhật phòng ban chưa có trưởng; KD-MB, KD-MN, XI-FLEXO để trống.
+UPDATE departments d
+SET head_employee_id = e.id
+FROM (VALUES
+    ('BGD', 'SP0001'),
+    ('NM', 'SP0002'),
+    ('NS', 'SP0003'),
+    ('KT', 'SP0005'),
+    ('KD', 'SP0007'),
+    ('XI', 'SP0010'),
+    ('XI-OFFSET', 'SP0012'),
+    ('XCD', 'SP0016'),
+    ('QC', 'SP0019'),
+    ('KHO', 'SP0022')
+) AS h(dept, emp)
+JOIN companies c ON c.code = 'SSPACK'
+JOIN employees e ON e.company_id = c.id AND e.employee_code = h.emp
+WHERE d.company_id = c.id
+  AND d.code = h.dept
+  AND d.head_employee_id IS NULL;

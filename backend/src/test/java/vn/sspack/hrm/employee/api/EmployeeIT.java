@@ -229,7 +229,7 @@ class EmployeeIT {
     // ================================================================= phạm vi dữ liệu
 
     @Test
-    @DisplayName("Phạm vi: HR thấy cả công ty; quản lý thấy cây phòng ban của mình; nhân viên chỉ thấy mình")
+    @DisplayName("Phạm vi: HR thấy cả công ty; quản lý thấy cây phòng ban mình làm trưởng; nhân viên chỉ thấy mình")
     void dataScope() throws Exception {
         long root = createDepartment(prefix + "-R", null);
         long child = createDepartment(prefix + "-C", root);
@@ -244,6 +244,7 @@ class EmployeeIT {
         long stranger = createEmployee(prefix + "-04", "Người phòng khác", outside, null);
         link(manager, managerUser.id());
         link(staff, staffUser.id());
+        setHead(root, manager);
         String managerToken = login(managerUser.email());
         String staffToken = login(staffUser.email());
         String orphanToken = login(orphanUser.email());
@@ -252,7 +253,7 @@ class EmployeeIT {
         assertThat(ids(hrToken, "")).containsExactlyInAnyOrder(manager, staff, colleague, stranger);
         assertThat(ids(hrToken, "&departmentId=" + root)).containsExactlyInAnyOrder(manager, staff, colleague);
 
-        // Quản lý: phòng ban của mình và cấp dưới; người ngoài 404; không thấy thông tin cá nhân của người khác
+        // Quản lý (trưởng phòng gốc): phòng ban làm trưởng và cấp dưới; người ngoài 404; không thấy thông tin cá nhân của người khác
         assertThat(ids(managerToken, "")).containsExactlyInAnyOrder(manager, staff, colleague);
         as(managerToken, get("/api/v1/employees/" + stranger)).andExpect(status().isNotFound());
         as(managerToken, get("/api/v1/employees/" + colleague))
@@ -278,7 +279,73 @@ class EmployeeIT {
         assertThat(ids(orphanToken, "")).isEmpty();
     }
 
+    @Test
+    @DisplayName("Quản lý không làm trưởng đơn vị nào chỉ thấy chính mình dù thuộc phòng ban có đồng nghiệp")
+    void managerHeadingNothingSeesOnlySelf() throws Exception {
+        long dept = createDepartment(prefix + "-A", null);
+        TestUsers.Created managerUser = testUsers.create("MANAGER", "EMPLOYEE");
+        long manager = createEmployee(prefix + "-01", "Quản lý", dept, null);
+        createEmployee(prefix + "-02", "Đồng nghiệp", dept, null);
+        link(manager, managerUser.id());
+
+        assertThat(ids(login(managerUser.email()), "")).containsExactly(manager);
+    }
+
+    @Test
+    @DisplayName("Trưởng phòng A thấy A và A1, không thấy phòng B")
+    void managerSeesSubtreesTheyHead() throws Exception {
+        long a = createDepartment(prefix + "-A", null);
+        long a1 = createDepartment(prefix + "-A1", a);
+        long b = createDepartment(prefix + "-B", null);
+        TestUsers.Created managerUser = testUsers.create("MANAGER", "EMPLOYEE");
+        long manager = createEmployee(prefix + "-01", "Trưởng A", a, null);
+        long inA1 = createEmployee(prefix + "-02", "Nhân viên A1", a1, null);
+        createEmployee(prefix + "-03", "Nhân viên B", b, null);
+        link(manager, managerUser.id());
+        setHead(a, manager);
+
+        assertThat(ids(login(managerUser.email()), "")).containsExactlyInAnyOrder(manager, inA1);
+    }
+
+    @Test
+    @DisplayName("Trưởng hai nhánh thấy cả hai nhánh, không thấy nhánh thứ ba")
+    void managerHeadingTwoBranchesSeesBoth() throws Exception {
+        long a = createDepartment(prefix + "-A", null);
+        long b = createDepartment(prefix + "-B", null);
+        long c = createDepartment(prefix + "-C", null);
+        TestUsers.Created managerUser = testUsers.create("MANAGER", "EMPLOYEE");
+        long manager = createEmployee(prefix + "-01", "Trưởng hai nhánh", c, null);
+        long inA = createEmployee(prefix + "-02", "Nhân viên A", a, null);
+        long inB = createEmployee(prefix + "-03", "Nhân viên B", b, null);
+        createEmployee(prefix + "-04", "Đồng nghiệp C", c, null);
+        link(manager, managerUser.id());
+        setHead(a, manager);
+        setHead(b, manager);
+
+        assertThat(ids(login(managerUser.email()), "")).containsExactlyInAnyOrder(manager, inA, inB);
+    }
+
+    @Test
+    @DisplayName("Trưởng phòng ban đã ngừng hoạt động vẫn thấy nhân viên của phòng ban đó")
+    void headOfInactiveDepartmentStillSeesIt() throws Exception {
+        long a = createDepartment(prefix + "-A", null);
+        long home = createDepartment(prefix + "-H", null);
+        TestUsers.Created managerUser = testUsers.create("MANAGER", "EMPLOYEE");
+        long manager = createEmployee(prefix + "-01", "Trưởng", home, null);
+        long inA = createEmployee(prefix + "-02", "Nhân viên A", a, null);
+        link(manager, managerUser.id());
+        setHead(a, manager);
+        jdbc.sql("UPDATE hrm.departments SET is_active = false WHERE id = :id").param("id", a).update();
+
+        assertThat(ids(login(managerUser.email()), "")).containsExactlyInAnyOrder(manager, inA);
+    }
+
     // ================================================================= tiện ích
+
+    private void setHead(long departmentId, long employeeId) {
+        jdbc.sql("UPDATE hrm.departments SET head_employee_id = :e WHERE id = :id")
+                .param("e", employeeId).param("id", departmentId).update();
+    }
 
     private List<Long> ids(String token, String extraQuery) throws Exception {
         String body = as(token, get("/api/v1/employees?size=100&q=" + prefix + extraQuery))

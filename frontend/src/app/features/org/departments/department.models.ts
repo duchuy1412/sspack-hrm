@@ -2,6 +2,16 @@ import { normalizeSearch } from '../../../shared/format/search';
 
 /** Kiểu dữ liệu và hàm thuần cho cây phòng ban (ORG-01), khớp `org.api.DepartmentDtos`. */
 
+export type HeadWarning = 'NO_ACCOUNT' | 'NO_MANAGER_SCOPE';
+
+/** Người được chỉ định (trưởng hoặc người duyệt thực tế), khớp `DepartmentDtos.PersonRef`. */
+export interface PersonRef {
+  employeeId: number;
+  code: string;
+  fullName: string;
+  warnings: HeadWarning[];
+}
+
 export interface Department {
   id: number;
   parentId: number | null;
@@ -14,6 +24,10 @@ export interface Department {
   childCount: number;
   employeeCount: number;
   workingEmployeeCount: number;
+  /** Trưởng đơn vị (ORG-04), null khi chưa chỉ định. */
+  head: PersonRef | null;
+  /** Người duyệt cấp 1 thực tế: trưởng, hoặc người leo lên từ cấp trên. */
+  effectiveApprover: PersonRef | null;
   version: number;
   updatedAt: string;
 }

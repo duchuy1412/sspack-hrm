@@ -317,6 +317,27 @@
       "deactivated": "Đã ngừng hoạt động {{name}}.",
       "activated": "{{name}} đã hoạt động lại.",
       "deleted": "Đã xóa {{name}}.",
+      "head": {
+        "label": "Trưởng",
+        "none": "—",
+        "approvedBy": "(duyệt bởi {{name}})",
+        "assign": "Chỉ định trưởng",
+        "change": "Đổi trưởng",
+        "clear": "Bỏ chỉ định",
+        "confirmClear": "Bỏ chỉ định trưởng của \"{{name}}\"? Đơn sẽ chuyển lên người duyệt ở cấp trên.",
+        "dialogTitle": "Chỉ định trưởng \"{{name}}\"",
+        "search": "Tìm nhân viên",
+        "searchPlaceholder": "Nhập tên hoặc mã",
+        "loading": "Đang tải danh sách nhân viên…",
+        "noMatch": "Không có nhân viên nào khớp.",
+        "hint": "Chỉ liệt kê nhân viên đang làm việc (thử việc, chính thức, nghỉ phép dài).",
+        "assigned": "Đã chỉ định {{head}} làm trưởng {{name}}.",
+        "cleared": "Đã bỏ chỉ định trưởng của {{name}}.",
+        "warnings": {
+          "NO_ACCOUNT": "Trưởng đơn vị chưa có tài khoản đăng nhập nên chưa duyệt được. Hãy tạo tài khoản trong Quản trị → Tài khoản.",
+          "NO_MANAGER_SCOPE": "Tài khoản của trưởng đơn vị chưa có vai trò quản lý theo phòng ban. Hãy gán vai trò trong Quản trị → Tài khoản."
+        }
+      },
       "currentParent": "(hiện tại)"
     },
     "positions": {
@@ -416,6 +437,8 @@
       "DEPARTMENT_CODE_EXISTS": "Mã phòng ban đã tồn tại.",
       "DEPARTMENT_CODE_INVALID": "Mã phòng ban không hợp lệ.",
       "DEPARTMENT_MOVE_CYCLE": "Không thể chuyển phòng ban vào chính nó hoặc vào phòng ban cấp dưới của nó.",
+      "DEPARTMENT_HEAD_NOT_WORKING": "Chỉ chỉ định được nhân viên đang làm việc làm trưởng đơn vị.",
+      "DEPARTMENT_HEAD_INACTIVE": "Phòng ban đã ngừng hoạt động nên không chỉ định trưởng mới được.",
       "DEPARTMENT_PARENT_INACTIVE": "Phòng ban cấp trên đã ngừng hoạt động.",
       "DEPARTMENT_HAS_CHILDREN": "Phòng ban còn {{childCount}} phòng ban cấp dưới. Hãy chuyển hoặc xóa chúng trước.",
       "DEPARTMENT_HAS_EMPLOYEES": "Phòng ban đã có {{employeeCount}} nhân viên nên không xóa được. Hãy chọn Ngừng hoạt động.",
@@ -453,6 +476,7 @@
       "collapse": "Thu gọn {{name}}",
       "people": "{{count}} người",
       "you": "Bạn",
+      "headBadge": "Trưởng đơn vị",
       "showMore": "Xem thêm {{count}} người",
       "empty": "Chưa có phòng ban đang hoạt động."
     }

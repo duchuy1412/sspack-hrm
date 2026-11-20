@@ -20,6 +20,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
 
     List<Employee> findByCompanyIdAndStatusIn(Long companyId, Collection<EmployeeStatus> statuses);
 
+    List<Employee> findByCompanyIdAndIdIn(Long companyId, Collection<Long> ids);
+
     boolean existsByCompanyIdAndCode(Long companyId, String code);
 
     boolean existsByCompanyIdAndCodeAndIdNot(Long companyId, String code, Long id);

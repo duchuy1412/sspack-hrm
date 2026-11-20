@@ -137,7 +137,15 @@ describe('OrgChartPage (ORG-03)', () => {
   it('phòng ban đông người chỉ hiện 6 người đầu, có nút Xem thêm', async () => {
     const crowd = Array.from({ length: 8 }, (_, i) => member(100 + i, `Công nhân ${i + 1}`));
     await setUp([
-      { id: 9, parentId: null, code: 'X', name: 'Xưởng lớn', depth: 1, members: crowd },
+      {
+        id: 9,
+        parentId: null,
+        code: 'X',
+        name: 'Xưởng lớn',
+        depth: 1,
+        headEmployeeId: null,
+        members: crowd,
+      },
     ]);
 
     expect(names()).toHaveLength(6);
@@ -146,5 +154,54 @@ describe('OrgChartPage (ORG-03)', () => {
     more.click();
     fixture.detectChanges();
     expect(names()).toHaveLength(8);
+  });
+
+  it('thẻ của trưởng đơn vị có nhãn "Trưởng đơn vị" và đứng đầu phòng; thẻ khác không có nhãn', async () => {
+    await setUp([
+      {
+        id: 2,
+        parentId: null,
+        code: 'XI',
+        name: 'Xưởng In',
+        depth: 1,
+        headEmployeeId: 11,
+        members: [member(11, 'Phạm Văn Đức', { head: true }), member(10, 'Trần Minh Anh')],
+      },
+    ]);
+
+    expect(names()).toEqual(['Phạm Văn Đức', 'Trần Minh Anh']);
+    expect(host.querySelector('[data-member="11"]')!.textContent).toContain('Trưởng đơn vị');
+    expect(host.querySelector('[data-member="10"]')!.textContent).not.toContain('Trưởng đơn vị');
+    expect(host.querySelectorAll('.head-badge').length).toBe(1);
+  });
+
+  it('trưởng kiêm nhiệm xuất hiện ở hai phòng: chỉ thẻ ở phòng mình làm trưởng có nhãn và chỉ thẻ đó là kết quả hiện tại', async () => {
+    await setUp([
+      {
+        id: 1,
+        parentId: null,
+        code: 'A',
+        name: 'A',
+        depth: 1,
+        headEmployeeId: 7,
+        members: [member(7, 'Hà Trưởng', { head: true })],
+      },
+      {
+        id: 2,
+        parentId: null,
+        code: 'B',
+        name: 'B',
+        depth: 1,
+        headEmployeeId: null,
+        members: [member(7, 'Hà Trưởng')],
+      },
+    ]);
+
+    expect(host.querySelectorAll('.head-badge').length).toBe(1);
+    expect(host.querySelector('[data-department="1"] .head-badge')).not.toBeNull();
+    type('truong');
+    expect(host.querySelectorAll('.member.match').length).toBe(2);
+    expect(host.querySelectorAll('.member.current').length).toBe(1);
+    expect(host.querySelector('[data-department="1"] .member.current')).not.toBeNull();
   });
 });

@@ -32,12 +32,14 @@ public class OrgChartController {
             String workEmail,
             @Schema(description = "Ảnh đại diện; null cho đến khi có ảnh hồ sơ (EMP-07)") String avatarUrl,
             @Schema(description = "Người xem mở được hồ sơ đầy đủ") boolean profileVisible,
-            @Schema(description = "Thẻ của chính người xem") boolean self) {
+            @Schema(description = "Thẻ của chính người xem") boolean self,
+            @Schema(description = "Trưởng đơn vị của phòng ban đang xem (ORG-04)") boolean head) {
     }
 
     @Schema(description = "Phòng ban đang hoạt động, xếp theo thứ tự cây (cha trước con)")
     public record ChartDepartmentResponse(Long id, Long parentId, String code, String name, int depth,
-                                          List<MemberResponse> members) {
+                                          @Schema(description = "Id nhân viên là trưởng đơn vị; null nếu chưa chỉ định")
+                                          Long headEmployeeId, List<MemberResponse> members) {
     }
 
     private final OrgChartService service;
@@ -59,11 +61,12 @@ public class OrgChartController {
 
     private static ChartDepartmentResponse toResponse(ChartDepartment d) {
         return new ChartDepartmentResponse(d.id(), d.parentId(), d.code(), d.name(), d.depth(),
+                d.headEmployeeId(),
                 d.members().stream().map(OrgChartController::toResponse).toList());
     }
 
     private static MemberResponse toResponse(Member m) {
         return new MemberResponse(m.id(), m.code(), m.fullName(), m.positionName(), m.workEmail(), m.avatarUrl(),
-                m.profileVisible(), m.self());
+                m.profileVisible(), m.self(), m.head());
     }
 }

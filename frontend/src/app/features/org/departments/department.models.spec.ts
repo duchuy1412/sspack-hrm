@@ -13,6 +13,8 @@ function dept(id: number, path: string, name: string, extra: Partial<Department>
     childCount: 0,
     employeeCount: 0,
     workingEmployeeCount: 0,
+    head: null,
+    effectiveApprover: null,
     version: 0,
     updatedAt: '2026-11-07T09:00:00+07:00',
     ...extra,

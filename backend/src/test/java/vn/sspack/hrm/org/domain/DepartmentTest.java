@@ -35,6 +35,17 @@ class DepartmentTest {
         throw new AssertionError("Không ném lỗi nghiệp vụ");
     }
 
+    @Test
+    @DisplayName("ancestorIdsFromSelf: path /1/4/12/ thành [12, 4, 1]")
+    void ancestorIdsFromSelf() {
+        Department root = saved(1, null, "ROOT");
+        Department mid = saved(4, root, "MID");
+        Department leaf = saved(12, mid, "LEAF");
+
+        assertThat(leaf.ancestorIdsFromSelf()).containsExactly(12L, 4L, 1L);
+        assertThat(root.ancestorIdsFromSelf()).containsExactly(1L);
+    }
+
     @Nested
     @DisplayName("Tạo")
     class Create {
@@ -192,5 +203,40 @@ class DepartmentTest {
             child.activate(parent, T0);
             assertThat(child.isActive()).isTrue();
         }
+    }
+
+    static final OffsetDateTime NOW = T0.plusDays(1);
+
+    static Department activeDepartment() {
+        return saved(20, null, "HD");
+    }
+
+    static Department inactiveDepartmentWithHead(Long headId) {
+        Department d = activeDepartment();
+        d.assignHead(headId, T0);
+        d.deactivate(0, 0, T0);
+        return d;
+    }
+
+    @Test
+    @DisplayName("ORG-04: chỉ định, giữ nguyên và bỏ trưởng đơn vị")
+    void assignHeadSetsAndClears() {
+        Department d = activeDepartment();
+        assertThat(d.assignHead(7L, NOW)).isTrue();
+        assertThat(d.getHeadEmployeeId()).isEqualTo(7L);
+        assertThat(d.getUpdatedAt()).isEqualTo(NOW);
+        assertThat(d.assignHead(7L, NOW.plusDays(1))).isFalse();
+        assertThat(d.getUpdatedAt()).isEqualTo(NOW);
+        assertThat(d.assignHead(null, NOW)).isTrue();
+        assertThat(d.getHeadEmployeeId()).isNull();
+    }
+
+    @Test
+    @DisplayName("ORG-04: phòng ban ngừng hoạt động chỉ cho phép bỏ trưởng đơn vị")
+    void inactiveDepartmentOnlyAllowsClearing() {
+        Department d = inactiveDepartmentWithHead(7L);
+        assertThatThrownBy(() -> d.assignHead(8L, NOW)).isInstanceOf(DepartmentRuleException.class)
+                .extracting("code").isEqualTo("DEPARTMENT_HEAD_INACTIVE");
+        assertThat(d.assignHead(null, NOW)).isTrue();
     }
 }

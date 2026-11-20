@@ -1,6 +1,7 @@
 package vn.sspack.hrm.org.api;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -30,7 +31,25 @@ public final class DepartmentDtos {
             @Schema(description = "Số nhân viên từng thuộc phòng ban (mọi trạng thái)") long employeeCount,
             @Schema(description = "Số nhân viên đang làm việc") long workingEmployeeCount,
             @Schema(description = "Gửi lại khi sửa để phát hiện sửa trùng") int version,
-            OffsetDateTime updatedAt) {
+            OffsetDateTime updatedAt,
+            @Schema(description = "Trưởng đơn vị; null = chưa chỉ định") PersonResponse head,
+            @Schema(description = "Người duyệt cấp 1 của nhân viên thường trong phòng ban (trưởng, hoặc trưởng cấp trên "
+                    + "khi chưa có); null = không có ai") PersonResponse effectiveApprover) {
+    }
+
+    @Schema(description = "Nhân viên được nhắc tới trên cây phòng ban")
+    public record PersonResponse(
+            Long employeeId,
+            String code,
+            String fullName,
+            @Schema(description = "Chỉ có với trưởng đơn vị: NO_ACCOUNT (chưa có tài khoản), "
+                    + "NO_MANAGER_SCOPE (vai trò không có quyền quản lý)") List<String> warnings) {
+    }
+
+    @Schema(description = "Chỉ định hoặc bỏ trưởng đơn vị")
+    public record HeadRequest(
+            @Schema(description = "Nhân viên làm trưởng; null = bỏ trưởng") Long employeeId,
+            @NotNull(message = "Thiếu phiên bản dữ liệu") Integer version) {
     }
 
     @Schema(description = "Tạo phòng ban")

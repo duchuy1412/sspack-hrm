@@ -15,6 +15,8 @@ export function department(id: number, name: string, path: string, active = true
     childCount: 0,
     employeeCount: 0,
     workingEmployeeCount: 0,
+    head: null,
+    effectiveApprover: null,
     version: 0,
     updatedAt: '2026-11-09T09:00:00+07:00',
   };

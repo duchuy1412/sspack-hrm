@@ -87,7 +87,7 @@ class OrgChartIT {
         assertThat(members.get(0).get("positionName")).isEqualTo("Chức danh " + prefix + "-TP");
         assertThat(members).allSatisfy(m -> assertThat(m.keySet())
                 .containsExactlyInAnyOrder("id", "code", "fullName", "positionName", "workEmail", "avatarUrl",
-                        "profileVisible", "self"));
+                        "profileVisible", "self", "head"));
         assertThat(members).extracting(m -> m.get("self")).containsExactly(false, false, true);
         assertThat(members).extracting(m -> m.get("profileVisible")).containsExactly(false, false, true);
         assertThat(body).doesNotContain("0903000000").doesNotContain("1990-01-01");
@@ -119,6 +119,70 @@ class OrgChartIT {
     void needsOrgRead() throws Exception {
         String token = login(testUsers.create("INTERVIEWER").email());
         as(token, get("/api/v1/org-chart")).andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("Trưởng đơn vị đứng đầu phòng với head = true, dù cấp bậc thấp hơn")
+    void headListedFirstWithFlag() throws Exception {
+        long low = createPosition(prefix + "-NV", 6_000_000, 9_000_000);
+        long high = createPosition(prefix + "-TP", 25_000_000, 40_000_000);
+        long dept = createDepartment(prefix + "-D", null);
+        createEmployee(prefix + "-01", "Cấp Cao", dept, high, "ACTIVE");
+        long head = createEmployee(prefix + "-02", "Bùi Trưởng", dept, low, "ACTIVE");
+        setHead(dept, head);
+
+        String body = as(hrToken, get("/api/v1/org-chart")).andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        List<Map<String, Object>> members = JsonPath.read(body, "$[?(@.id == " + dept + ")].members[*]");
+        assertThat(members).extracting(m -> m.get("fullName")).containsExactly("Bùi Trưởng", "Cấp Cao");
+        assertThat(members).extracting(m -> m.get("head")).containsExactly(true, false);
+        List<Number> headIds = JsonPath.read(body, "$[?(@.id == " + dept + ")].headEmployeeId");
+        assertThat(headIds.get(0).longValue()).isEqualTo(head);
+    }
+
+    @Test
+    @DisplayName("Trưởng kiêm nhiệm thuộc phòng khác: đứng đầu phòng X, ở phòng gốc head = false, không lặp")
+    void headFromAnotherDepartmentShownFirst() throws Exception {
+        long position = createPosition(prefix + "-P", 6_000_000, 9_000_000);
+        long x = createDepartment(prefix + "-X", null);
+        long y = createDepartment(prefix + "-Y", null);
+        createEmployee(prefix + "-01", "Nhân viên X", x, position, "ACTIVE");
+        long head = createEmployee(prefix + "-02", "Trưởng Từ Y", y, position, "ACTIVE");
+        setHead(x, head);
+
+        String body = as(hrToken, get("/api/v1/org-chart")).andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        List<Map<String, Object>> inX = JsonPath.read(body, "$[?(@.id == " + x + ")].members[*]");
+        assertThat(inX).extracting(m -> m.get("fullName")).containsExactly("Trưởng Từ Y", "Nhân viên X");
+        assertThat(inX).extracting(m -> m.get("head")).containsExactly(true, false);
+        List<Map<String, Object>> inY = JsonPath.read(body, "$[?(@.id == " + y + ")].members[*]");
+        assertThat(inY).hasSize(1);
+        assertThat(inY.get(0).get("head")).isEqualTo(false);
+    }
+
+    @Test
+    @DisplayName("Trưởng đã nghỉ việc không hiện đầu phòng")
+    void resignedHeadNotShown() throws Exception {
+        long position = createPosition(prefix + "-P", 6_000_000, 9_000_000);
+        long dept = createDepartment(prefix + "-D", null);
+        createEmployee(prefix + "-01", "Nhân viên", dept, position, "ACTIVE");
+        long head = createEmployee(prefix + "-02", "Trưởng đã nghỉ", dept, position, "ACTIVE");
+        setHead(dept, head);
+        jdbc.sql("UPDATE hrm.employees SET status = 'RESIGNED' WHERE id = :id").param("id", head).update();
+
+        String body = as(hrToken, get("/api/v1/org-chart")).andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        List<Map<String, Object>> members = JsonPath.read(body, "$[?(@.id == " + dept + ")].members[*]");
+        assertThat(members).extracting(m -> m.get("fullName")).containsExactly("Nhân viên");
+        assertThat(members).extracting(m -> m.get("head")).containsExactly(false);
+    }
+
+    private void setHead(long departmentId, long employeeId) {
+        jdbc.sql("UPDATE hrm.departments SET head_employee_id = :e WHERE id = :d")
+                .param("e", employeeId).param("d", departmentId).update();
     }
 
     // ================================================================= tiện ích

@@ -55,4 +55,14 @@ public final class DepartmentRuleException extends ApiException {
                 "Phòng ban còn " + count + " nhân viên đang làm việc. Hãy điều chuyển họ trước.",
                 Map.of("employeeCount", count));
     }
+
+    static DepartmentRuleException headOnInactiveDepartment() {
+        return new DepartmentRuleException(HttpStatus.CONFLICT, "DEPARTMENT_HEAD_INACTIVE",
+                "Phòng ban đã ngừng hoạt động, không thể chỉ định trưởng đơn vị.");
+    }
+
+    public static DepartmentRuleException headNotWorking() {
+        return new DepartmentRuleException(HttpStatus.UNPROCESSABLE_ENTITY, "DEPARTMENT_HEAD_NOT_WORKING",
+                "Nhân viên không tồn tại hoặc đã nghỉ việc.");
+    }
 }

@@ -1,6 +1,9 @@
 package vn.sspack.hrm.org.domain;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -51,6 +54,9 @@ public class Department {
 
     @Column(nullable = false, length = 1000)
     private String path;
+
+    @Column(name = "head_employee_id")
+    private Long headEmployeeId;
 
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
@@ -158,9 +164,53 @@ public class Department {
         updatedAt = now;
     }
 
+    /**
+     * Kiểm tra quy tắc chỉ định trưởng (ORG-04) mà không đổi gì: phòng ban ngừng hoạt động chỉ được bỏ trưởng.
+     *
+     * @return true nếu việc chỉ định này làm đổi trưởng, false nếu là no-op
+     */
+    public boolean wouldChangeHead(Long employeeId) {
+        if (Objects.equals(headEmployeeId, employeeId)) {
+            return false;
+        }
+        if (!active && employeeId != null) {
+            throw DepartmentRuleException.headOnInactiveDepartment();
+        }
+        return true;
+    }
+
+    /**
+     * Gán trưởng đơn vị (null = bỏ). Xem {@link #wouldChangeHead}.
+     *
+     * @return true khi có thay đổi
+     */
+    public boolean assignHead(Long employeeId, OffsetDateTime now) {
+        if (!active && employeeId != null) {
+            throw DepartmentRuleException.headOnInactiveDepartment();
+        }
+        if (Objects.equals(headEmployeeId, employeeId)) {
+            return false;
+        }
+        headEmployeeId = employeeId;
+        updatedAt = now;
+        return true;
+    }
+
     /** Số cấp tính từ gốc: phòng ban cấp cao nhất là 1. */
     public int depth() {
         return (int) path.chars().filter(c -> c == '/').count() - 1;
+    }
+
+    /** Id của chính nó rồi các cấp cha lên tới gốc: path {@code /1/4/12/} thành {@code [12, 4, 1]}. */
+    public List<Long> ancestorIdsFromSelf() {
+        List<Long> ids = new ArrayList<>();
+        for (String part : path.split("/")) {
+            if (!part.isEmpty()) {
+                ids.add(Long.parseLong(part));
+            }
+        }
+        Collections.reverse(ids);
+        return ids;
     }
 
     public Long getId() {
@@ -185,6 +235,10 @@ public class Department {
 
     public String getPath() {
         return path;
+    }
+
+    public Long getHeadEmployeeId() {
+        return headEmployeeId;
     }
 
     public boolean isActive() {
