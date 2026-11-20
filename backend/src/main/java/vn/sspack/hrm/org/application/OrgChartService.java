@@ -32,12 +32,12 @@ public class OrgChartService {
 
     /** Một người trên sơ đồ. {@code avatarUrl} luôn null cho đến khi có ảnh hồ sơ (EMP-07). */
     public record Member(Long id, String code, String fullName, String positionName, String workEmail,
-                         String avatarUrl, boolean profileVisible, boolean self) {
+                         String avatarUrl, boolean profileVisible, boolean self, boolean head) {
     }
 
     /** Phòng ban trên sơ đồ, trả phẳng theo thứ tự cây; frontend dựng cây từ {@code parentId}. */
     public record ChartDepartment(Long id, Long parentId, String code, String name, int depth,
-                                  List<Member> members) {
+                                  Long headEmployeeId, List<Member> members) {
     }
 
     private final DepartmentRepository departments;
@@ -68,7 +68,10 @@ public class OrgChartService {
             gradeRank.put(gradeOrder.get(i).getId(), i);
         }
 
-        Map<Long, List<DirectoryCard>> byDepartment = directory.workingEmployees(companyId, viewerUserId).stream()
+        List<DirectoryCard> working = directory.workingEmployees(companyId, viewerUserId);
+        Map<Long, DirectoryCard> cardById = working.stream()
+                .collect(Collectors.toMap(DirectoryCard::id, Function.identity()));
+        Map<Long, List<DirectoryCard>> byDepartment = working.stream()
                 .collect(Collectors.groupingBy(DirectoryCard::departmentId));
         Collator vietnamese = Collator.getInstance(Locale.forLanguageTag("vi"));
         Comparator<DirectoryCard> order = Comparator
@@ -77,12 +80,20 @@ public class OrgChartService {
 
         List<ChartDepartment> result = new ArrayList<>();
         for (Department d : active) {
-            List<Member> members = byDepartment.getOrDefault(d.getId(), List.of()).stream()
+            // Trưởng đơn vị (nếu đang làm việc) đứng đầu với head = true, kể cả khi thuộc phòng khác (kiêm nhiệm);
+            // ở phòng gốc người đó vẫn đứng theo thứ tự thường với head = false.
+            DirectoryCard head = d.getHeadEmployeeId() == null ? null : cardById.get(d.getHeadEmployeeId());
+            List<Member> members = new ArrayList<>();
+            if (head != null) {
+                members.add(member(head, positionById.get(head.positionId()), true));
+            }
+            byDepartment.getOrDefault(d.getId(), List.of()).stream()
+                    .filter(c -> head == null || !c.id().equals(head.id()))
                     .sorted(order)
-                    .map(c -> member(c, positionById.get(c.positionId())))
-                    .toList();
+                    .map(c -> member(c, positionById.get(c.positionId()), false))
+                    .forEach(members::add);
             result.add(new ChartDepartment(d.getId(), d.getParentId(), d.getCode(), d.getName(), d.depth(),
-                    members));
+                    d.getHeadEmployeeId(), List.copyOf(members)));
         }
         return result;
     }
@@ -92,8 +103,8 @@ public class OrgChartService {
         return p == null ? -1 : gradeRank.getOrDefault(p.getJobGradeId(), -1);
     }
 
-    private static Member member(DirectoryCard c, Position position) {
+    private static Member member(DirectoryCard c, Position position, boolean head) {
         return new Member(c.id(), c.code(), c.fullName(), position == null ? null : position.getName(),
-                c.workEmail(), null, c.profileVisible(), c.self());
+                c.workEmail(), null, c.profileVisible(), c.self(), head);
     }
 }
