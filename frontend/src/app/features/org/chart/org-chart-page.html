@@ -144,13 +144,17 @@
                 }
                 <span class="muted">{{ m.positionName }}</span>
               </span>
-              @if (m.head) {
-                <span class="chip chip-brand head-badge">{{
-                  'org.chart.headBadge' | transloco
-                }}</span>
-              }
-              @if (m.self) {
-                <span class="chip chip-brand">{{ 'org.chart.you' | transloco }}</span>
+              @if (m.head || m.self) {
+                <span class="badges">
+                  @if (m.head) {
+                    <span class="chip chip-brand head-badge">{{
+                      'org.chart.headBadge' | transloco
+                    }}</span>
+                  }
+                  @if (m.self) {
+                    <span class="chip chip-brand">{{ 'org.chart.you' | transloco }}</span>
+                  }
+                </span>
               }
             </li>
           }
