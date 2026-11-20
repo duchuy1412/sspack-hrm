@@ -32,6 +32,14 @@ jobs:
       - name: ./mvnw verify
         run: ./mvnw -B -ntp verify
 
+      - name: Lưu báo cáo bao phủ
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/target/site/jacoco
+          if-no-files-found: ignore
+
       - name: Lưu báo cáo test
         if: failure()
         uses: actions/upload-artifact@v4

@@ -168,6 +168,8 @@ cd frontend && npm test -- --watch=false && npm run build
 
 CI chạy cả hai trên mỗi pull request.
 
+Bao phủ backend đo bằng JaCoCo (gộp unit test và test tích hợp). Báo cáo HTML ở `backend/target/site/jacoco/index.html` sau `./mvnw verify`; trên CI tải về từ artifact `backend-coverage`. `verify` sẽ thất bại nếu một package `domain` hoặc `application` có bao phủ dòng dưới 80%.
+
 ## Quy ước
 
 Quy ước code, phân quyền, định dạng dữ liệu và cách làm việc theo nhánh/commit nằm trong [`CLAUDE.md`](CLAUDE.md). Toàn bộ dữ liệu mẫu là hư cấu.
