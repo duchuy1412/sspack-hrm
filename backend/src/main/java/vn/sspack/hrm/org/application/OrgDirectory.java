@@ -1,9 +1,11 @@
 package vn.sspack.hrm.org.application;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -66,6 +68,18 @@ public class OrgDirectory {
         return departments.findByIdAndCompanyId(departmentId, companyId)
                 .map(d -> departments.findIdsByPathPrefix(companyId, d.getPath()))
                 .orElse(List.of());
+    }
+
+    /**
+     * Hợp các nhánh của mọi phòng ban (kể cả đã ngừng hoạt động) mà nhân viên này làm trưởng; rỗng nếu không
+     * làm trưởng đơn vị nào.
+     */
+    public Set<Long> headedSubtreeIds(long companyId, long employeeId) {
+        Set<Long> ids = new HashSet<>();
+        for (Department d : departments.findByCompanyIdAndHeadEmployeeId(companyId, employeeId)) {
+            ids.addAll(departments.findIdsByPathPrefix(companyId, d.getPath()));
+        }
+        return ids;
     }
 
     /**

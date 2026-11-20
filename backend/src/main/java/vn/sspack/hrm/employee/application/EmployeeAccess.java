@@ -18,8 +18,8 @@ import vn.sspack.hrm.shared.security.DataScope;
  *
  * <ul>
  *   <li>ALL: cả công ty.</li>
- *   <li>DEPARTMENT_TREE: phòng ban trong hồ sơ của chính người xem và mọi phòng ban cấp dưới. Tạm thời cho đến
- *       ORG-04; khi có trưởng đơn vị sẽ đổi thành "các phòng ban mình làm trưởng".</li>
+ *   <li>DEPARTMENT_TREE: các phòng ban người xem làm trưởng (ORG-04) và mọi phòng ban cấp dưới, cộng hồ sơ của
+ *       chính mình. Không làm trưởng đơn vị nào thì chỉ thấy chính mình.</li>
  *   <li>DEPARTMENT: chỉ phòng ban của người xem.</li>
  *   <li>SELF, ASSIGNED: chỉ hồ sơ của chính mình.</li>
  * </ul>
@@ -72,7 +72,7 @@ class EmployeeAccess {
         return switch (scope.get()) {
             case ALL -> new Visibility(true, Set.of(), selfId);
             case DEPARTMENT_TREE -> self
-                    .map(e -> new Visibility(false, Set.copyOf(org.subtreeIds(companyId, e.getDepartmentId())), selfId))
+                    .map(e -> new Visibility(false, org.headedSubtreeIds(companyId, e.getId()), selfId))
                     .orElse(Visibility.NONE);
             case DEPARTMENT -> self
                     .map(e -> new Visibility(false, Set.copyOf(List.of(e.getDepartmentId())), selfId))
