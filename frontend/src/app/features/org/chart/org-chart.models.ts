@@ -67,17 +67,33 @@ export function buildChart(departments: readonly ChartDepartment[]): ChartNode[]
     const parent = parentId === null ? undefined : nodes.get(parentId);
     (parent ? parent.children : roots).push(node);
   }
-  const finish = (list: ChartNode[]): number => {
+  // Đếm theo id khác nhau: trưởng kiêm nhiệm có thẻ ở hai phòng ban nhưng chỉ là một người.
+  const finish = (list: ChartNode[]): Set<number> => {
     list.sort((a, b) => a.department.name.localeCompare(b.department.name, 'vi'));
-    let sum = 0;
+    const all = new Set<number>();
     for (const n of list) {
-      n.total = n.department.members.length + finish(n.children);
-      sum += n.total;
+      const ids = new Set(n.department.members.map((m) => m.id));
+      for (const id of finish(n.children)) {
+        ids.add(id);
+      }
+      n.total = ids.size;
+      ids.forEach((id) => all.add(id));
     }
-    return sum;
+    return all;
   };
   finish(roots);
   return roots;
+}
+
+/** Tổng số người khác nhau trên sơ đồ (một người ở hai phòng ban chỉ tính một lần). */
+export function countPeople(roots: readonly ChartNode[]): number {
+  const ids = new Set<number>();
+  const visit = (node: ChartNode): void => {
+    node.department.members.forEach((m) => ids.add(m.id));
+    node.children.forEach(visit);
+  };
+  roots.forEach(visit);
+  return ids.size;
 }
 
 /**

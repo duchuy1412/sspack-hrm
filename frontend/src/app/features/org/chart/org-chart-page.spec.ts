@@ -137,7 +137,15 @@ describe('OrgChartPage (ORG-03)', () => {
   it('phòng ban đông người chỉ hiện 6 người đầu, có nút Xem thêm', async () => {
     const crowd = Array.from({ length: 8 }, (_, i) => member(100 + i, `Công nhân ${i + 1}`));
     await setUp([
-      { id: 9, parentId: null, code: 'X', name: 'Xưởng lớn', depth: 1, headEmployeeId: null, members: crowd },
+      {
+        id: 9,
+        parentId: null,
+        code: 'X',
+        name: 'Xưởng lớn',
+        depth: 1,
+        headEmployeeId: null,
+        members: crowd,
+      },
     ]);
 
     expect(names()).toHaveLength(6);

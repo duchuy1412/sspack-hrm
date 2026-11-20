@@ -1,4 +1,10 @@
-import { ChartDepartment, ChartMember, buildChart, searchChart } from './org-chart.models';
+import {
+  ChartDepartment,
+  ChartMember,
+  buildChart,
+  countPeople,
+  searchChart,
+} from './org-chart.models';
 
 export function member(
   id: number,
@@ -118,5 +124,35 @@ describe('searchChart', () => {
       [7, 1],
       [7, 2],
     ]);
+  });
+});
+
+describe('đếm người khi trưởng kiêm nhiệm có thẻ ở hai phòng ban', () => {
+  const dup = (id: number, parentId: number | null, members: ChartMember[]): ChartDepartment => ({
+    id,
+    parentId,
+    code: `D${id}`,
+    name: `Phòng ${id}`,
+    depth: 1,
+    headEmployeeId: null,
+    members,
+  });
+
+  it('cùng một nhánh: tổng nhánh tính người đó một lần', () => {
+    const roots = buildChart([
+      dup(1, null, [member(1, 'Giám đốc')]),
+      dup(2, 1, [member(7, 'Hà Trưởng', { head: true }), member(8, 'Bình An')]),
+      dup(3, 1, [member(7, 'Hà Trưởng')]),
+    ]);
+    expect(roots[0].total).toBe(3);
+    expect(roots[0].children.map((c) => c.total)).toEqual([2, 1]);
+  });
+
+  it('tổng toàn sơ đồ (thanh công cụ) tính một lần, kể cả khác nhánh', () => {
+    const roots = buildChart([
+      dup(1, null, [member(7, 'Hà Trưởng', { head: true }), member(8, 'Bình An')]),
+      dup(2, null, [member(7, 'Hà Trưởng'), member(9, 'Cao Nam')]),
+    ]);
+    expect(countPeople(roots)).toBe(3);
   });
 });
