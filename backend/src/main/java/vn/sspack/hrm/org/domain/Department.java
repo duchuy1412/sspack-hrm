@@ -1,6 +1,9 @@
 package vn.sspack.hrm.org.domain;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -181,6 +184,18 @@ public class Department {
     /** Số cấp tính từ gốc: phòng ban cấp cao nhất là 1. */
     public int depth() {
         return (int) path.chars().filter(c -> c == '/').count() - 1;
+    }
+
+    /** Id của chính nó rồi các cấp cha lên tới gốc: path {@code /1/4/12/} thành {@code [12, 4, 1]}. */
+    public List<Long> ancestorIdsFromSelf() {
+        List<Long> ids = new ArrayList<>();
+        for (String part : path.split("/")) {
+            if (!part.isEmpty()) {
+                ids.add(Long.parseLong(part));
+            }
+        }
+        Collections.reverse(ids);
+        return ids;
     }
 
     public Long getId() {

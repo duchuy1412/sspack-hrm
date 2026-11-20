@@ -35,6 +35,17 @@ class DepartmentTest {
         throw new AssertionError("Không ném lỗi nghiệp vụ");
     }
 
+    @Test
+    @DisplayName("ancestorIdsFromSelf: path /1/4/12/ thành [12, 4, 1]")
+    void ancestorIdsFromSelf() {
+        Department root = saved(1, null, "ROOT");
+        Department mid = saved(4, root, "MID");
+        Department leaf = saved(12, mid, "LEAF");
+
+        assertThat(leaf.ancestorIdsFromSelf()).containsExactly(12L, 4L, 1L);
+        assertThat(root.ancestorIdsFromSelf()).containsExactly(1L);
+    }
+
     @Nested
     @DisplayName("Tạo")
     class Create {
