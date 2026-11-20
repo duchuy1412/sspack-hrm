@@ -126,7 +126,10 @@
               class="member"
               [attr.data-member]="m.id"
               [class.match]="search()?.memberIds?.has(m.id)"
-              [class.current]="currentMemberId() === m.id"
+              [class.current]="
+                currentMemberId() === m.id && currentDepartmentId() === node.department.id
+              "
+              [class.head]="m.head"
             >
               @if (m.avatarUrl) {
                 <img class="avatar" [src]="m.avatarUrl" alt="" />
@@ -141,6 +144,11 @@
                 }
                 <span class="muted">{{ m.positionName }}</span>
               </span>
+              @if (m.head) {
+                <span class="chip chip-brand head-badge">{{
+                  'org.chart.headBadge' | transloco
+                }}</span>
+              }
               @if (m.self) {
                 <span class="chip chip-brand">{{ 'org.chart.you' | transloco }}</span>
               }

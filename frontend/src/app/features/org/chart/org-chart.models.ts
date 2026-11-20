@@ -16,6 +16,8 @@ export interface ChartMember {
   /** Người xem mở được hồ sơ đầy đủ. */
   profileVisible: boolean;
   self: boolean;
+  /** Là trưởng của phòng ban đang hiển thị (ORG-04); server xếp trưởng lên đầu danh sách. */
+  head: boolean;
 }
 
 /** Phòng ban đang hoạt động, server trả phẳng theo thứ tự cây. */
@@ -25,6 +27,8 @@ export interface ChartDepartment {
   code: string;
   name: string;
   depth: number;
+  /** Trưởng đơn vị (ORG-04), null khi chưa chỉ định. */
+  headEmployeeId: number | null;
   members: ChartMember[];
 }
 

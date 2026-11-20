@@ -14,6 +14,7 @@ export function member(
     avatarUrl: null,
     profileVisible: false,
     self: false,
+    head: false,
     ...extra,
   };
 }
@@ -25,6 +26,7 @@ export const CHART: ChartDepartment[] = [
     code: 'NM',
     name: 'Nhà máy',
     depth: 1,
+    headEmployeeId: null,
     members: [member(1, 'Lương Thế Vinh')],
   },
   {
@@ -33,6 +35,7 @@ export const CHART: ChartDepartment[] = [
     code: 'XI',
     name: 'Xưởng In',
     depth: 2,
+    headEmployeeId: null,
     members: [
       member(10, 'Trần Minh Anh'),
       member(11, 'Phạm Văn Đức', { self: true, profileVisible: true }),
@@ -44,6 +47,7 @@ export const CHART: ChartDepartment[] = [
     code: 'KHO',
     name: 'Kho vận',
     depth: 2,
+    headEmployeeId: null,
     members: [member(22, 'Vũ Đình Khoa')],
   },
   {
@@ -52,6 +56,7 @@ export const CHART: ChartDepartment[] = [
     code: 'BGD',
     name: 'Ban Giám đốc',
     depth: 1,
+    headEmployeeId: null,
     members: [member(5, 'Đinh Quốc Bảo')],
   },
 ];
@@ -83,5 +88,35 @@ describe('searchChart', () => {
 
     const many = searchChart(buildChart(CHART), 'n')!;
     expect(many.matches.map((m) => m.member.id)).toEqual([5, 1, 22, 10, 11]);
+  });
+
+  it('một người xuất hiện ở hai phòng ban (trưởng kiêm nhiệm): mỗi thẻ là một kết quả, giữ thứ tự server', () => {
+    const chart: ChartDepartment[] = [
+      {
+        id: 1,
+        parentId: null,
+        code: 'A',
+        name: 'A',
+        depth: 1,
+        headEmployeeId: 7,
+        members: [member(7, 'Hà Trưởng', { head: true }), member(8, 'Bình An')],
+      },
+      {
+        id: 2,
+        parentId: null,
+        code: 'B',
+        name: 'B',
+        depth: 1,
+        headEmployeeId: null,
+        members: [member(9, 'Cao Nam'), member(7, 'Hà Trưởng')],
+      },
+    ];
+    const roots = buildChart(chart);
+    expect(roots[0].department.members.map((m) => m.id)).toEqual([7, 8]);
+    const result = searchChart(roots, 'truong')!;
+    expect(result.matches.map((m) => [m.member.id, m.departmentId])).toEqual([
+      [7, 1],
+      [7, 2],
+    ]);
   });
 });

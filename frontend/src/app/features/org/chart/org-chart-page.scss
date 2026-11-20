@@ -106,6 +106,10 @@
     background: var(--brand-soft);
   }
 
+  &.head {
+    border-color: var(--brand-strong);
+  }
+
   &.current {
     outline: 2px solid var(--brand-strong);
     outline-offset: 1px;

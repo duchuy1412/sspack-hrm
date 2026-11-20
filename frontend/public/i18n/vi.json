@@ -476,6 +476,7 @@
       "collapse": "Thu gọn {{name}}",
       "people": "{{count}} người",
       "you": "Bạn",
+      "headBadge": "Trưởng đơn vị",
       "showMore": "Xem thêm {{count}} người",
       "empty": "Chưa có phòng ban đang hoạt động."
     }

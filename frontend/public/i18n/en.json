@@ -476,6 +476,7 @@
       "collapse": "Collapse {{name}}",
       "people": "{{count}} people",
       "you": "You",
+      "headBadge": "Head",
       "showMore": "Show {{count}} more",
       "empty": "No active departments yet."
     }

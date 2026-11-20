@@ -50,6 +50,10 @@ export class OrgChartPage {
 
   protected readonly search = computed(() => searchChart(this.roots(), this.query()));
   protected readonly total = computed(() => this.roots().reduce((sum, r) => sum + r.total, 0));
+  protected readonly currentDepartmentId = computed(() => {
+    const s = this.search();
+    return s && s.matches.length ? s.matches[this.current()].departmentId : null;
+  });
   protected readonly currentMemberId = computed(() => {
     const s = this.search();
     return s && s.matches.length ? s.matches[this.current()].member.id : null;
@@ -144,7 +148,11 @@ export class OrgChartPage {
         if (id === null) {
           return;
         }
-        const card = this.host.nativeElement.querySelector<HTMLElement>(`[data-member="${id}"]`);
+        // Một người có thể có thẻ ở hai phòng ban (trưởng kiêm nhiệm): chọn đúng thẻ của kết quả hiện tại.
+        const departmentId = this.currentDepartmentId();
+        const card = this.host.nativeElement.querySelector<HTMLElement>(
+          `[data-department="${departmentId}"] > .members [data-member="${id}"]`,
+        );
         const reduced =
           globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
         card?.scrollIntoView?.({ block: 'center', behavior: reduced ? 'auto' : 'smooth' });
