@@ -280,7 +280,7 @@ describe('DepartmentsPage (ORG-01)', () => {
       .flush({
         content: [employee(7, 'Trần Minh Anh'), employee(8, 'Phạm Văn Đức')],
         page: 0,
-        size: 500,
+        size: 100,
         totalElements: 2,
         totalPages: 1,
       });
@@ -395,5 +395,39 @@ describe('DepartmentsPage (ORG-01)', () => {
     expect(row(2).textContent).toContain('Trưởng: Trần Minh Anh');
     expect(button(row(2), 'Bỏ chỉ định')).toBeUndefined();
     expect(button(row(2), 'Chỉ định trưởng')).toBeUndefined();
+  });
+
+  it('ô chọn trưởng tải mọi trang nhân viên (server giới hạn 100/trang)', async () => {
+    await setUp('HR');
+    fixture.componentInstance['departments'].set(WITH_HEAD);
+    fixture.detectChanges();
+    button(row(3), 'Chỉ định trưởng')!.click();
+
+    const first = http.expectOne(
+      (r) => r.url === '/api/v1/employees' && r.params.get('page') === '0',
+    );
+    expect(first.request.params.get('size')).toBe('100');
+    first.flush({
+      content: [employee(7, 'Trần Minh Anh')],
+      page: 0,
+      size: 100,
+      totalElements: 101,
+      totalPages: 2,
+    });
+    const second = http.expectOne(
+      (r) => r.url === '/api/v1/employees' && r.params.get('page') === '1',
+    );
+    second.flush({
+      content: [employee(8, 'Phạm Văn Đức')],
+      page: 1,
+      size: 100,
+      totalElements: 101,
+      totalPages: 2,
+    });
+    fixture.detectChanges();
+
+    const labels = Array.from(host.querySelectorAll('.head-option')).map((e) => e.textContent);
+    expect(labels).toHaveLength(2);
+    expect(labels.join()).toContain('Phạm Văn Đức');
   });
 });

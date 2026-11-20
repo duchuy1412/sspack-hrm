@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin, map, of, switchMap } from 'rxjs';
 
 import { AuthService } from '../../../core/auth/auth.service';
 import { RbacErrorMessages } from '../../admin/rbac.api';
@@ -28,6 +28,9 @@ import { DepartmentsApi } from './departments.api';
 
 /** Mã lỗi phòng ban dịch trong `org.errors`, lỗi chung trong `admin.errors`. */
 const ERROR_PREFIXES = ['org.errors', 'admin.errors'];
+
+/** Trần `max-page-size` của backend. */
+const HEAD_PAGE_SIZE = 100;
 
 type EditMode =
   { kind: 'create'; parent: Department | null } | { kind: 'edit'; department: Department };
@@ -248,19 +251,30 @@ export class DepartmentsPage {
     this.dialogError.set(null);
     this.headLoading.set(true);
     this.headDialog().nativeElement.showModal();
-    // Chỉ nhân viên đang làm việc mới làm trưởng được; một công ty demo đủ trong một trang lớn
-    this.employeesApi
-      .list({
+    // Chỉ nhân viên đang làm việc mới làm trưởng được. Server giới hạn 100 dòng mỗi trang nên tải lần lượt
+    // mọi trang để tìm kiếm phía client thấy đủ người.
+    const fetchPage = (page: number) =>
+      this.employeesApi.list({
         q: '',
         departmentId: null,
         statuses: ['PROBATION', 'ACTIVE', 'ON_LEAVE'],
-        page: 0,
-        size: 500,
-      })
+        page,
+        size: HEAD_PAGE_SIZE,
+      });
+    fetchPage(0)
+      .pipe(
+        switchMap((first) =>
+          first.totalPages > 1
+            ? forkJoin(
+                Array.from({ length: first.totalPages - 1 }, (_, i) => fetchPage(i + 1)),
+              ).pipe(map((rest) => [first, ...rest].flatMap((p) => p.content)))
+            : of(first.content),
+        ),
+      )
       .subscribe({
-        next: (page) => {
+        next: (content) => {
           this.headCandidates.set(
-            [...page.content].sort((a, b) => a.fullName.localeCompare(b.fullName, 'vi')),
+            [...content].sort((a, b) => a.fullName.localeCompare(b.fullName, 'vi')),
           );
           this.headLoading.set(false);
         },
