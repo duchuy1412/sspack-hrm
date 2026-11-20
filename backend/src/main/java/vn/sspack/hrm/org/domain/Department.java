@@ -165,7 +165,22 @@ public class Department {
     }
 
     /**
-     * Chỉ định hoặc bỏ (null) trưởng đơn vị (ORG-04). Phòng ban ngừng hoạt động chỉ được bỏ trưởng.
+     * Kiểm tra quy tắc chỉ định trưởng (ORG-04) mà không đổi gì: phòng ban ngừng hoạt động chỉ được bỏ trưởng.
+     *
+     * @return true nếu việc chỉ định này làm đổi trưởng, false nếu là no-op
+     */
+    public boolean wouldChangeHead(Long employeeId) {
+        if (Objects.equals(headEmployeeId, employeeId)) {
+            return false;
+        }
+        if (!active && employeeId != null) {
+            throw DepartmentRuleException.headOnInactiveDepartment();
+        }
+        return true;
+    }
+
+    /**
+     * Gán trưởng đơn vị (null = bỏ). Xem {@link #wouldChangeHead}.
      *
      * @return true khi có thay đổi
      */

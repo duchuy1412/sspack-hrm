@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -48,16 +49,22 @@ public class DepartmentController {
             description = "Toàn bộ cây theo thứ tự cha trước con; không phân trang vì frontend dựng cây từ đây.")
     @PreAuthorize("hasAuthority('org:read')")
     @GetMapping
-    public List<DepartmentResponse> list(@AuthenticationPrincipal Jwt jwt,
+    public List<DepartmentResponse> list(@AuthenticationPrincipal Jwt jwt, Authentication authentication,
                                          @RequestParam(defaultValue = "false") boolean includeInactive) {
-        return service.list(RequestActor.companyId(jwt), includeInactive).stream().map(mapper::toResponse).toList();
+        return service.list(RequestActor.companyId(jwt), includeInactive, canManage(authentication)).stream().map(mapper::toResponse).toList();
     }
 
     @Operation(summary = "Chi tiết phòng ban")
     @PreAuthorize("hasAuthority('org:read')")
     @GetMapping("/{id}")
-    public DepartmentResponse get(@AuthenticationPrincipal Jwt jwt, @PathVariable long id) {
-        return mapper.toResponse(service.get(RequestActor.companyId(jwt), id));
+    public DepartmentResponse get(@AuthenticationPrincipal Jwt jwt, Authentication authentication,
+                                  @PathVariable long id) {
+        return mapper.toResponse(service.get(RequestActor.companyId(jwt), id, canManage(authentication)));
+    }
+
+    /** Cảnh báo về tài khoản/quyền của trưởng đơn vị chỉ dành cho người có org:manage. */
+    private static boolean canManage(Authentication authentication) {
+        return authentication.getAuthorities().stream().anyMatch(a -> "org:manage".equals(a.getAuthority()));
     }
 
     @Operation(summary = "Tạo phòng ban", description = "Mã được chuyển về chữ in hoa.")

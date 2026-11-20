@@ -86,7 +86,7 @@ public class DepartmentService {
 
     /** Mọi phòng ban theo thứ tự cây (cha trước con); ngừng hoạt động chỉ có khi {@code includeInactive}. */
     @Transactional(readOnly = true)
-    public List<DepartmentView> list(long companyId, boolean includeInactive) {
+    public List<DepartmentView> list(long companyId, boolean includeInactive, boolean includeWarnings) {
         // Người duyệt hiệu lực tính trên toàn bộ phòng ban: cấp trên có thể đã ngừng hoạt động
         List<Department> company = departments.findByCompanyIdOrderByPathAsc(companyId);
         List<Department> shown = includeInactive ? company : company.stream().filter(Department::isActive).toList();
@@ -98,12 +98,12 @@ public class DepartmentService {
         });
         Map<Long, Headcount> counts = headcounts.countByDepartment(companyId,
                 shown.stream().map(Department::getId).toList());
-        return toViews(companyId, company, shown, children, counts);
+        return toViews(companyId, company, shown, children, counts, includeWarnings);
     }
 
     @Transactional(readOnly = true)
-    public DepartmentView get(long companyId, long id) {
-        return view(load(companyId, id));
+    public DepartmentView get(long companyId, long id, boolean includeWarnings) {
+        return view(load(companyId, id), includeWarnings);
     }
 
     // ================================================================= ghi
@@ -205,6 +205,10 @@ public class DepartmentService {
                 .orElseThrow(DepartmentService::notFound);
         checkVersion(department, command.version());
         Long employeeId = command.employeeId();
+        // Quy tắc miền và no-op xét trước khi tra nhân viên
+        if (!department.wouldChangeHead(employeeId)) {
+            return view(department);
+        }
         if (employeeId != null) {
             EmployeeRef ref = employeeRefs.refs(actor.companyId(), List.of(employeeId)).get(employeeId);
             if (ref == null || !ref.working()) {
@@ -249,11 +253,16 @@ public class DepartmentService {
                 .get(department.getId());
     }
 
+    /** Dùng cho các thao tác ghi (đều yêu cầu org:manage nên luôn kèm cảnh báo). */
     private DepartmentView view(Department department) {
+        return view(department, true);
+    }
+
+    private DepartmentView view(Department department, boolean includeWarnings) {
         long companyId = department.getCompanyId();
         return toViews(companyId, departments.findByCompanyIdOrderByPathAsc(companyId), List.of(department),
                 Map.of(department.getId(), (int) departments.countByParentId(department.getId())),
-                Map.of(department.getId(), headcount(department))).get(0);
+                Map.of(department.getId(), headcount(department)), includeWarnings).get(0);
     }
 
     /**
@@ -261,7 +270,8 @@ public class DepartmentService {
      * đọc nhân viên, quyền của tài khoản trưởng tra một lần cho mỗi tài khoản.
      */
     private List<DepartmentView> toViews(long companyId, List<Department> company, List<Department> shown,
-                                         Map<Long, Integer> children, Map<Long, Headcount> counts) {
+                                         Map<Long, Integer> children, Map<Long, Headcount> counts,
+                                         boolean includeWarnings) {
         Map<Long, Optional<Long>> approvers = headResolver.effectiveApprovers(companyId, company);
         Set<Long> ids = new HashSet<>();
         for (Department d : shown) {
@@ -276,7 +286,7 @@ public class DepartmentService {
         for (Department d : shown) {
             EmployeeRef head = d.getHeadEmployeeId() == null ? null : refs.get(d.getHeadEmployeeId());
             PersonRef headRef = head == null ? null
-                    : new PersonRef(head.id(), head.code(), head.fullName(), warnings(companyId, head, scopes));
+                    : new PersonRef(head.id(), head.code(), head.fullName(), includeWarnings ? warnings(companyId, head, scopes) : List.of());
             EmployeeRef approver = approvers.getOrDefault(d.getId(), Optional.empty()).map(refs::get).orElse(null);
             PersonRef approverRef = approver == null ? null
                     : new PersonRef(approver.id(), approver.code(), approver.fullName(), List.of());

@@ -79,7 +79,7 @@ public class OrgDirectory {
         for (Department d : departments.findByCompanyIdAndHeadEmployeeId(companyId, employeeId)) {
             ids.addAll(departments.findIdsByPathPrefix(companyId, d.getPath()));
         }
-        return ids;
+        return Set.copyOf(ids);
     }
 
     /**

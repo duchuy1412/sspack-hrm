@@ -38,7 +38,10 @@ public class DepartmentHeadResolver {
         this.employeeRefs = employeeRefs;
     }
 
-    /** @return mã nhân viên người duyệt cấp 1; rỗng nếu phòng ban không thuộc công ty hoặc không có ai phù hợp */
+    /**
+     * Người gọi truyền phòng ban gốc (home) của chính người gửi, không phải phòng ban họ đang xem hay kiêm nhiệm.
+     *
+     * @return mã nhân viên người duyệt cấp 1; rỗng nếu phòng ban không thuộc công ty hoặc không có ai phù hợp */
     @Transactional(readOnly = true)
     public Optional<Long> firstLevelApprover(long companyId, long departmentId, long requesterEmployeeId) {
         Optional<Department> own = departments.findByIdAndCompanyId(departmentId, companyId);
