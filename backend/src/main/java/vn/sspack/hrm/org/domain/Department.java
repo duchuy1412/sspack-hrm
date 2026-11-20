@@ -52,6 +52,9 @@ public class Department {
     @Column(nullable = false, length = 1000)
     private String path;
 
+    @Column(name = "head_employee_id")
+    private Long headEmployeeId;
+
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
 
@@ -158,6 +161,23 @@ public class Department {
         updatedAt = now;
     }
 
+    /**
+     * Chỉ định hoặc bỏ (null) trưởng đơn vị (ORG-04). Phòng ban ngừng hoạt động chỉ được bỏ trưởng.
+     *
+     * @return true khi có thay đổi
+     */
+    public boolean assignHead(Long employeeId, OffsetDateTime now) {
+        if (!active && employeeId != null) {
+            throw DepartmentRuleException.headOnInactiveDepartment();
+        }
+        if (Objects.equals(headEmployeeId, employeeId)) {
+            return false;
+        }
+        headEmployeeId = employeeId;
+        updatedAt = now;
+        return true;
+    }
+
     /** Số cấp tính từ gốc: phòng ban cấp cao nhất là 1. */
     public int depth() {
         return (int) path.chars().filter(c -> c == '/').count() - 1;
@@ -185,6 +205,10 @@ public class Department {
 
     public String getPath() {
         return path;
+    }
+
+    public Long getHeadEmployeeId() {
+        return headEmployeeId;
     }
 
     public boolean isActive() {
