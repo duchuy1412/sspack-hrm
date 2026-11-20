@@ -299,6 +299,25 @@ describe('DepartmentsPage (ORG-01)', () => {
     expect(row(2).textContent).not.toContain('duyệt bởi');
   });
 
+  it('trưởng đã nghỉ nhưng người duyệt khác: hiện "(duyệt bởi X)"; trùng nhau thì không', async () => {
+    await setUp('HR');
+    fixture.componentInstance['departments'].set([
+      dept(1, '/1/', 'Nhà máy', {
+        head: person(7, 'Trần Minh Anh'),
+        effectiveApprover: person(9, 'Lê Giám Đốc'),
+      }),
+      dept(2, '/1/2/', 'Xưởng In', {
+        head: person(7, 'Trần Minh Anh'),
+        effectiveApprover: person(7, 'Trần Minh Anh'),
+      }),
+    ]);
+    fixture.detectChanges();
+
+    expect(row(1).textContent).toContain('Trưởng: Trần Minh Anh');
+    expect(row(1).textContent).toContain('(duyệt bởi Lê Giám Đốc)');
+    expect(row(2).textContent).not.toContain('duyệt bởi');
+  });
+
   it('cảnh báo trưởng thiếu tài khoản hoặc phạm vi quản lý, có title', async () => {
     await setUp('HR');
     fixture.componentInstance['departments'].set(WITH_HEAD);

@@ -116,10 +116,12 @@
                 >⚠</span
               >
             }
-            @if (!d.head && d.effectiveApprover; as approver) {
+            @if (d.effectiveApprover; as approver) {
+              @if (approver.employeeId !== d.head?.employeeId) {
               <span class="muted">
                 {{ 'org.departments.head.approvedBy' | transloco: { name: approver.fullName } }}
               </span>
+              }
             }
           </span>
         </div>
@@ -341,7 +343,7 @@
         <button
           type="submit"
           class="btn btn-primary"
-          [disabled]="headSelectedId() === null || busy()"
+          [disabled]="headSelectedId() === null || headSelectedId() === headFor()?.head?.employeeId || busy()"
         >
           {{ (busy() ? 'admin.saving' : 'admin.save') | transloco }}
         </button>
