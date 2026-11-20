@@ -317,6 +317,27 @@
       "deactivated": "Deactivated {{name}}.",
       "activated": "{{name}} is active again.",
       "deleted": "Deleted {{name}}.",
+      "head": {
+        "label": "Head",
+        "none": "—",
+        "approvedBy": "(approved by {{name}})",
+        "assign": "Assign head",
+        "change": "Change head",
+        "clear": "Remove head",
+        "confirmClear": "Remove the head of \"{{name}}\"? Requests will go to the approver one level up.",
+        "dialogTitle": "Assign head of \"{{name}}\"",
+        "search": "Find employee",
+        "searchPlaceholder": "Name or code",
+        "loading": "Loading employees…",
+        "noMatch": "No matching employee.",
+        "hint": "Only currently working employees are listed (probation, active, on leave).",
+        "assigned": "{{head}} is now head of {{name}}.",
+        "cleared": "Removed the head of {{name}}.",
+        "warnings": {
+          "NO_ACCOUNT": "This head has no login account and cannot approve yet. Create one in Administration → Accounts.",
+          "NO_MANAGER_SCOPE": "This head's account has no department-level manager role. Assign a role in Administration → Accounts."
+        }
+      },
       "currentParent": "(current)"
     },
     "positions": {
@@ -416,6 +437,8 @@
       "DEPARTMENT_CODE_EXISTS": "This department code already exists.",
       "DEPARTMENT_CODE_INVALID": "Invalid department code.",
       "DEPARTMENT_MOVE_CYCLE": "A department cannot be moved into itself or one of its sub-units.",
+      "DEPARTMENT_HEAD_NOT_WORKING": "Only a currently working employee can be a department head.",
+      "DEPARTMENT_HEAD_INACTIVE": "The department is inactive, so a new head cannot be assigned.",
       "DEPARTMENT_PARENT_INACTIVE": "The parent department is inactive.",
       "DEPARTMENT_HAS_CHILDREN": "This department has {{childCount}} sub-units. Move or delete them first.",
       "DEPARTMENT_HAS_EMPLOYEES": "This department has had {{employeeCount}} employees and cannot be deleted. Deactivate it instead.",

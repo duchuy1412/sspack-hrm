@@ -104,6 +104,24 @@
             {{ d.code }} ·
             {{ 'org.departments.employees' | transloco: { count: d.workingEmployeeCount } }}
           </span>
+          <span class="head-line">
+            {{ 'org.departments.head.label' | transloco }}:
+            {{ d.head?.fullName ?? ('org.departments.head.none' | transloco) }}
+            @for (w of d.head?.warnings ?? []; track w) {
+              <span
+                class="head-warning"
+                role="img"
+                [title]="warningText(w)"
+                [attr.aria-label]="warningText(w)"
+                >⚠</span
+              >
+            }
+            @if (!d.head && d.effectiveApprover; as approver) {
+              <span class="muted">
+                {{ 'org.departments.head.approvedBy' | transloco: { name: approver.fullName } }}
+              </span>
+            }
+          </span>
         </div>
         @if (!d.active) {
           <span class="chip">{{ 'org.departments.inactive' | transloco }}</span>
@@ -111,6 +129,12 @@
         @if (canManage()) {
           <div class="actions">
             @if (d.active) {
+              <button type="button" class="link-button" (click)="openHead(d)">
+                {{
+                  (d.head ? 'org.departments.head.change' : 'org.departments.head.assign')
+                    | transloco
+                }}
+              </button>
               <button type="button" class="link-button" (click)="openCreate(d)">
                 {{ 'org.departments.addChild' | transloco }}
               </button>
@@ -126,6 +150,11 @@
             } @else {
               <button type="button" class="link-button" (click)="setActive(d, true)">
                 {{ 'org.departments.activate' | transloco }}
+              </button>
+            }
+            @if (d.head) {
+              <button type="button" class="link-button" (click)="clearHead(d)">
+                {{ 'org.departments.head.clear' | transloco }}
               </button>
             }
             @if (d.childCount === 0 && d.employeeCount === 0) {
@@ -243,6 +272,78 @@
         </button>
         <button type="submit" class="btn btn-primary" [disabled]="moveTargetId() === '' || busy()">
           {{ 'org.departments.moveConfirm' | transloco }}
+        </button>
+      </div>
+    </form>
+  }
+</dialog>
+
+<dialog
+  #headDialog
+  id="head-dialog"
+  class="dialog card"
+  aria-labelledby="dept-head-title"
+  (cancel)="closeHead()"
+>
+  @if (headFor(); as d) {
+    <form class="dialog-body" (submit)="$event.preventDefault(); confirmHead()">
+      <h2 id="dept-head-title" class="heading">
+        {{ 'org.departments.head.dialogTitle' | transloco: { name: d.name } }}
+      </h2>
+      <div class="field">
+        <label class="field-label" for="head-search">{{
+          'org.departments.head.search' | transloco
+        }}</label>
+        <input
+          id="head-search"
+          type="search"
+          name="headSearch"
+          autocomplete="off"
+          [ngModel]="headQuery()"
+          (ngModelChange)="headQuery.set($event)"
+          [placeholder]="'org.departments.head.searchPlaceholder' | transloco"
+        />
+        <span class="muted">{{ 'org.departments.head.hint' | transloco }}</span>
+      </div>
+      <div
+        class="head-list"
+        role="radiogroup"
+        [attr.aria-label]="'org.departments.head.search' | transloco"
+      >
+        @if (headLoading()) {
+          <p class="muted">{{ 'org.departments.head.loading' | transloco }}</p>
+        } @else if (headOptions().length === 0) {
+          <p class="muted">{{ 'org.departments.head.noMatch' | transloco }}</p>
+        } @else {
+          @for (e of headOptions(); track e.id) {
+            <label class="head-option">
+              <input
+                type="radio"
+                name="headEmployee"
+                [value]="e.id"
+                [checked]="headSelectedId() === e.id"
+                (change)="headSelectedId.set(e.id)"
+              />
+              <span
+                >{{ e.fullName }} <span class="muted">· {{ e.code }}</span></span
+              >
+            </label>
+          }
+        }
+      </div>
+      @if (dialogError(); as message) {
+        <p class="alert" role="alert">{{ message }}</p>
+      }
+      <div class="dialog-actions">
+        <button type="button" class="btn" (click)="closeHead()">
+          {{ 'admin.cancel' | transloco }}
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="headSelectedId() === null || busy()"
+        >
+          {{ (busy() ? 'admin.saving' : 'admin.save') | transloco }}
         </button>
       </div>
     </form>

@@ -27,6 +27,10 @@ export class DepartmentsApi {
     return this.http.put<Department>(`${API}/${id}/parent`, { parentId, version });
   }
 
+  setHead(id: number, employeeId: number | null, version: number): Observable<Department> {
+    return this.http.put<Department>(`${API}/${id}/head`, { employeeId, version });
+  }
+
   setActive(id: number, active: boolean, version: number): Observable<Department> {
     return this.http.put<Department>(`${API}/${id}/status`, { active, version });
   }

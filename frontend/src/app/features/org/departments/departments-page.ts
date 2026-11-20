@@ -14,6 +14,8 @@ import { Observable } from 'rxjs';
 
 import { AuthService } from '../../../core/auth/auth.service';
 import { RbacErrorMessages } from '../../admin/rbac.api';
+import { EmployeeSummary, EmployeesApi } from '../../employees/employees.api';
+import { normalizeSearch } from '../../../shared/format/search';
 import {
   Department,
   DepartmentNode,
@@ -43,10 +45,12 @@ type EditMode =
 })
 export class DepartmentsPage {
   private readonly api = inject(DepartmentsApi);
+  private readonly employeesApi = inject(EmployeesApi);
   private readonly errors = inject(RbacErrorMessages);
   private readonly transloco = inject(TranslocoService);
   private readonly editDialog = viewChild.required<ElementRef<HTMLDialogElement>>('editDialog');
   private readonly moveDialog = viewChild.required<ElementRef<HTMLDialogElement>>('moveDialog');
+  private readonly headDialog = viewChild.required<ElementRef<HTMLDialogElement>>('headDialog');
 
   private readonly auth = inject(AuthService);
 
@@ -89,6 +93,21 @@ export class DepartmentsPage {
           .filter((d) => canMoveTo(dragged, d) || d.id === dragged.parentId)
           .map((d) => ({ department: d, current: d.id === dragged.parentId }))
       : [];
+  });
+
+  // ---- hộp thoại chỉ định trưởng (ORG-04)
+  protected readonly headFor = signal<Department | null>(null);
+  protected readonly headCandidates = signal<EmployeeSummary[]>([]);
+  protected readonly headLoading = signal(false);
+  protected readonly headQuery = signal('');
+  protected readonly headSelectedId = signal<number | null>(null);
+  protected readonly headOptions = computed(() => {
+    const q = normalizeSearch(this.headQuery());
+    return q
+      ? this.headCandidates().filter(
+          (e) => normalizeSearch(e.fullName).includes(q) || normalizeSearch(e.code).includes(q),
+        )
+      : this.headCandidates();
   });
 
   constructor() {
@@ -217,6 +236,88 @@ export class DepartmentsPage {
         target: target?.name ?? this.transloco.translate('org.departments.rootLevel'),
       }),
     );
+  }
+
+  // ================================================================= trưởng đơn vị (ORG-04)
+
+  protected openHead(department: Department): void {
+    this.headFor.set(department);
+    this.headQuery.set('');
+    this.headSelectedId.set(department.head?.employeeId ?? null);
+    this.headCandidates.set([]);
+    this.dialogError.set(null);
+    this.headLoading.set(true);
+    this.headDialog().nativeElement.showModal();
+    // Chỉ nhân viên đang làm việc mới làm trưởng được; một công ty demo đủ trong một trang lớn
+    this.employeesApi
+      .list({
+        q: '',
+        departmentId: null,
+        statuses: ['PROBATION', 'ACTIVE', 'ON_LEAVE'],
+        page: 0,
+        size: 500,
+      })
+      .subscribe({
+        next: (page) => {
+          this.headCandidates.set(
+            [...page.content].sort((a, b) => a.fullName.localeCompare(b.fullName, 'vi')),
+          );
+          this.headLoading.set(false);
+        },
+        error: (err: unknown) => {
+          this.dialogError.set(this.errors.describe(err, ERROR_PREFIXES));
+          this.headLoading.set(false);
+        },
+      });
+  }
+
+  protected closeHead(): void {
+    this.headDialog().nativeElement.close();
+    this.headFor.set(null);
+  }
+
+  protected confirmHead(): void {
+    const department = this.headFor();
+    const employeeId = this.headSelectedId();
+    if (!department || employeeId === null) {
+      return;
+    }
+    this.busy.set(true);
+    this.dialogError.set(null);
+    this.api.setHead(department.id, employeeId, department.version).subscribe({
+      next: (saved) => {
+        this.busy.set(false);
+        this.closeHead();
+        this.notice.set(
+          this.transloco.translate('org.departments.head.assigned', {
+            head: saved.head?.fullName ?? '',
+            name: saved.name,
+          }),
+        );
+        this.reload();
+      },
+      error: (err: unknown) => {
+        this.busy.set(false);
+        this.dialogError.set(this.errors.describe(err, ERROR_PREFIXES));
+      },
+    });
+  }
+
+  protected clearHead(department: Department): void {
+    if (
+      !confirm(
+        this.transloco.translate('org.departments.head.confirmClear', { name: department.name }),
+      )
+    ) {
+      return;
+    }
+    this.run(this.api.setHead(department.id, null, department.version), () =>
+      this.transloco.translate('org.departments.head.cleared', { name: department.name }),
+    );
+  }
+
+  protected warningText(code: string): string {
+    return this.transloco.translate(`org.departments.head.warnings.${code}`);
   }
 
   // ================================================================= thêm, sửa

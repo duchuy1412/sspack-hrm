@@ -8,7 +8,8 @@ import { vi } from 'vitest';
 import vi_ from '../../../../../public/i18n/vi.json';
 import { FakeAuth, SystemRole } from '../../../../testing/fake-auth';
 import { AuthService } from '../../../core/auth/auth.service';
-import { Department } from './department.models';
+import { EmployeeSummary } from '../../employees/employees.api';
+import { Department, PersonRef } from './department.models';
 import { DepartmentsPage } from './departments-page';
 
 function dept(id: number, path: string, name: string, extra: Partial<Department> = {}): Department {
@@ -24,6 +25,8 @@ function dept(id: number, path: string, name: string, extra: Partial<Department>
     childCount: 0,
     employeeCount: 0,
     workingEmployeeCount: 0,
+    head: null,
+    effectiveApprover: null,
     version: 2,
     updatedAt: '2026-11-07T09:00:00+07:00',
     ...extra,
@@ -227,5 +230,170 @@ describe('DepartmentsPage (ORG-01)', () => {
     fixture.detectChanges();
 
     expect(names()).toEqual(['Nhà máy', 'Xưởng In', 'Tổ In offset']);
+  });
+
+  // ---- ORG-04: trưởng đơn vị
+
+  function person(id: number, fullName: string, warnings: PersonRef['warnings'] = []): PersonRef {
+    return { employeeId: id, code: `NV${id}`, fullName, warnings };
+  }
+
+  function employee(id: number, fullName: string): EmployeeSummary {
+    return {
+      id,
+      code: `NV${id}`,
+      fullName,
+      workEmail: null,
+      departmentId: 2,
+      departmentName: 'Xưởng In',
+      positionId: null,
+      positionName: null,
+      hireDate: '2025-01-01',
+      status: 'ACTIVE',
+    };
+  }
+
+  const WITH_HEAD = [
+    dept(1, '/1/', 'Nhà máy', { childCount: 1, effectiveApprover: person(9, 'Lê Giám Đốc') }),
+    dept(2, '/1/2/', 'Xưởng In', {
+      head: person(7, 'Trần Minh Anh', ['NO_ACCOUNT']),
+      effectiveApprover: person(7, 'Trần Minh Anh', ['NO_ACCOUNT']),
+    }),
+    dept(3, '/1/2/3/', 'Tổ In offset', {
+      effectiveApprover: person(7, 'Trần Minh Anh', ['NO_ACCOUNT']),
+    }),
+    dept(5, '/5/', 'Khối Văn phòng', {
+      head: person(8, 'Phạm Văn Đức', ['NO_MANAGER_SCOPE']),
+      effectiveApprover: person(8, 'Phạm Văn Đức', ['NO_MANAGER_SCOPE']),
+      active: false,
+    }),
+  ];
+
+  function button(scope: HTMLElement, text: string): HTMLButtonElement | undefined {
+    return Array.from(scope.querySelectorAll('button')).find((b) => b.textContent?.includes(text));
+  }
+
+  async function openHeadDialog(): Promise<void> {
+    button(row(3), 'Chỉ định trưởng')!.click();
+    http
+      .expectOne((r) => r.url === '/api/v1/employees')
+      .flush({
+        content: [employee(7, 'Trần Minh Anh'), employee(8, 'Phạm Văn Đức')],
+        page: 0,
+        size: 500,
+        totalElements: 2,
+        totalPages: 1,
+      });
+    fixture.detectChanges();
+  }
+
+  it('hàng phòng ban hiện trưởng; phòng chưa có trưởng hiện người duyệt thay thế', async () => {
+    await setUp('HR');
+    // list đầu của setUp đã flush LIST; thay bằng dữ liệu có trưởng
+    fixture.componentInstance['departments'].set(WITH_HEAD);
+    fixture.detectChanges();
+
+    expect(row(2).textContent).toContain('Trưởng: Trần Minh Anh');
+    expect(row(3).textContent).toContain('Trưởng: —');
+    expect(row(3).textContent).toContain('(duyệt bởi Trần Minh Anh)');
+    expect(row(2).textContent).not.toContain('duyệt bởi');
+  });
+
+  it('cảnh báo trưởng thiếu tài khoản hoặc phạm vi quản lý, có title', async () => {
+    await setUp('HR');
+    fixture.componentInstance['departments'].set(WITH_HEAD);
+    fixture.detectChanges();
+
+    const titles = (id: number) =>
+      Array.from(row(id).querySelectorAll<HTMLElement>('.head-warning')).map((e) =>
+        e.getAttribute('title'),
+      );
+    expect(titles(2)).toEqual([vi_.org.departments.head.warnings.NO_ACCOUNT]);
+    expect(titles(5)).toEqual([vi_.org.departments.head.warnings.NO_MANAGER_SCOPE]);
+    expect(titles(2)[0]).toContain('Quản trị');
+  });
+
+  it('chỉ định trưởng: gõ không dấu lọc đúng người, Lưu gọi setHead kèm version', async () => {
+    await setUp('HR');
+    fixture.componentInstance['departments'].set(WITH_HEAD);
+    fixture.detectChanges();
+    await openHeadDialog();
+
+    const labels = () =>
+      Array.from(host.querySelectorAll('.head-option')).map((e) => e.textContent!.trim());
+    expect(labels()).toHaveLength(2);
+    const search = host.querySelector<HTMLInputElement>('#head-search')!;
+    search.value = 'minh anh';
+    search.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(labels()).toHaveLength(1);
+    expect(labels()[0]).toContain('Trần Minh Anh');
+
+    host.querySelector<HTMLInputElement>('.head-option input')!.click();
+    fixture.detectChanges();
+    button(host.querySelector('#head-dialog')!, 'Lưu')!.click();
+
+    const req = http.expectOne('/api/v1/departments/3/head');
+    expect(req.request.method).toBe('PUT');
+    expect(req.request.body).toEqual({ employeeId: 7, version: 2 });
+    req.flush(WITH_HEAD[2]);
+    flushList();
+  });
+
+  it('"Bỏ chỉ định" gọi setHead với null', async () => {
+    await setUp('HR');
+    fixture.componentInstance['departments'].set(WITH_HEAD);
+    fixture.detectChanges();
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+    button(row(2), 'Bỏ chỉ định')!.click();
+
+    const req = http.expectOne('/api/v1/departments/2/head');
+    expect(req.request.body).toEqual({ employeeId: null, version: 2 });
+    req.flush(dept(2, '/1/2/', 'Xưởng In'));
+    flushList();
+  });
+
+  it('lỗi 422 hiện thông báo từ org.errors trong hộp thoại', async () => {
+    await setUp('HR');
+    fixture.componentInstance['departments'].set(WITH_HEAD);
+    fixture.detectChanges();
+    await openHeadDialog();
+
+    host.querySelector<HTMLInputElement>('.head-option input')!.click();
+    fixture.detectChanges();
+    button(host.querySelector('#head-dialog')!, 'Lưu')!.click();
+    http
+      .expectOne('/api/v1/departments/3/head')
+      .flush(
+        { code: 'DEPARTMENT_HEAD_NOT_WORKING', detail: 'x' },
+        { status: 422, statusText: 'Unprocessable' },
+      );
+    fixture.detectChanges();
+
+    expect(host.querySelector('#head-dialog [role="alert"]')?.textContent).toContain(
+      vi_.org.errors.DEPARTMENT_HEAD_NOT_WORKING,
+    );
+  });
+
+  it('phòng ngừng hoạt động: ẩn "Chỉ định trưởng", còn "Bỏ chỉ định" khi có trưởng', async () => {
+    await setUp('HR');
+    fixture.componentInstance['departments'].set(WITH_HEAD);
+    fixture.detectChanges();
+
+    expect(button(row(5), 'Chỉ định trưởng')).toBeUndefined();
+    expect(button(row(5), 'Bỏ chỉ định')).toBeDefined();
+  });
+
+  it('Nhân viên (chỉ xem): vẫn thấy trưởng nhưng không có nút chỉ định', async () => {
+    await setUp('EMPLOYEE');
+    fixture.componentInstance['departments'].set(WITH_HEAD);
+    fixture.detectChanges();
+
+    expect(row(2).textContent).toContain('Trưởng: Trần Minh Anh');
+    expect(button(row(2), 'Bỏ chỉ định')).toBeUndefined();
+    expect(button(row(2), 'Chỉ định trưởng')).toBeUndefined();
   });
 });
